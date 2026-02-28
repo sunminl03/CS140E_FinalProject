@@ -26,6 +26,33 @@ void *read_file(unsigned *size, const char *name) {
     //    - read entire file into buffer (read_exact())
     //    - fclose() the file descriptor
     //    - make sure any padding bytes have zeros.
-    //    - return it.   
-    unimplemented();
+    //    - return it. 
+
+    // save the size using stat 
+    struct stat st;
+    if (stat(name, &st) < 0)
+        sys_die("stat failed on %s\n", name);
+
+    unsigned nbytes = st.st_size;
+    
+    // allocate buffer aaa
+    char *buffer = calloc(1, nbytes+4);
+
+    // open fd 
+    int fd = open(name, O_RDONLY);
+    if (fd < 0)
+        sys_die("open failed on %s\n", name);
+
+    // read in to buffer
+    if (nbytes != 0) {
+        read_exact(fd, buffer, nbytes);
+    }
+    
+    // save size
+    *size = nbytes;
+    // close fd
+    if (close(fd) < 0)
+        sys_die("close failed\n", name);
+    return buffer;
+
 }

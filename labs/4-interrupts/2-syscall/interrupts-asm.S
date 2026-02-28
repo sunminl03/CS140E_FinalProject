@@ -37,6 +37,26 @@ _data_abort_asm:              .word data_abort_asm
 _interrupt_asm:               .word interrupt_asm
 _interrupt_table_end:   @ end of the table.
 
+.globl _interrupt_table_user
+_interrupt_table_user:
+  @ Q: why can we copy these ldr jumps and have
+  @ them work the same?
+  ldr pc, _reset_asm
+  ldr pc, _undefined_instruction_asm
+  ldr pc, _software_interrupt_asm_user
+  ldr pc, _prefetch_abort_asm
+  ldr pc, _data_abort_asm
+  ldr pc, _reset_asm
+  ldr pc, _interrupt_asm
+  ldr pc, fast_interrupt_asm
+
+
+_software_interrupt_asm_user:      .word software_interrupt_asm_user
+
+.globl _interrupt_table_user_end
+_interrupt_table_user_end:   @ end of the table.
+
+
 @ only handler that should run since we 
 @ only enable general interrupts
 interrupt_asm:
@@ -72,6 +92,20 @@ interrupt_asm:
 
 @ change this to call your system call handler.
 software_interrupt_asm:
+    @ 1   
+    push {r1-r3, lr}
+    @ 2
+    sub   lr, lr, #4
+    @ 3
+    mov r1, r0
+    @ 4
+    mov   r0, lr
+    @ 5 
+    bl    syscall_vector
+    @ 6
+    pop {r1-r3, lr}
+
+    
     @ runs at system level (p.a2-5): assumes we have a sp
     @
     @ you're going to call:
@@ -87,8 +121,28 @@ software_interrupt_asm:
     @   6 restore regs: must be identical to what got pushed 
     @     at step (1)
     @   - return from the exception (look at interrupt_asm)
-    asm_not_implemented()
+    @ asm_not_implemented()
+
     movs pc, lr
+
+software_interrupt_asm_user:
+    mov sp, #INT_STACK_ADDR 
+    @ 1   
+    push {r1-r3, lr}
+    @ 2
+    sub   lr, lr, #4
+    @ 3
+    mov r1, r0
+    @ 4
+    mov   r0, lr
+    @ 5 
+    bl    syscall_vector
+    @ 6
+    pop {r1-r3, lr}
+    movs pc, lr
+
+
+
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ currently we don't use any of these, so just panic and

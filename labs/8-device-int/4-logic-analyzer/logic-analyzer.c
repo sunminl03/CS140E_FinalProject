@@ -32,7 +32,20 @@ void interrupt_vector(unsigned pc) {
     unsigned s = cycle_cnt_read();
 
     dev_barrier();
-    unimplemented();
+    cq_push32(&uartQ, (uint32_t)(s));
+    uint32_t pre_val = 0;
+
+    if (gpio_event_detected(in_pin)) {
+        if (gpio_read(in_pin)) { //rising edge
+            n_rising_edge += 1;
+            pre_val = 0;
+        } else {
+            n_falling_edge += 1;
+            pre_val = 1;
+        }
+        gpio_event_clear(in_pin);
+    }
+    cq_push32(&uartQ, pre_val);
     dev_barrier();
 }
 

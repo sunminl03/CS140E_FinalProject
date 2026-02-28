@@ -1,0 +1,15 @@
+DEBUG:done with options: dev name=</dev/cu.usbserial-310>, pi-prog=<./tests/3-one-way-ack-Nbytes.bin>, trace=0
+opened tty port </dev/cu.usbserial-310>.
+DEBUG:my-install: tty-usb=</dev/cu.usbserial-310> program=<./tests/3-one-way-ack-Nbytes.bin>: about to boot
+TRACE:simple_boot: sending 31772 bytes, crc32=c178d034
+BOOT:waiting for a start
+DEBUG:PRINT_STRING:pi sent print: <<Sally Lee UART>: success: Received the program!>
+BOOT:bootloader: Done.
+TRACE:notmain:send total=1000, 32-byte messages from server=[0xd5d5d5] to client=[0xe5e5e5]
+TRACE:one_way_ack:sent 100 ack'd packets
+TRACE:one_way_ack:sent 200 ack'd packets
+TRACE:one_way_ack:sent 300 ack'd packets
+TRACE:one_way_ack:sent 400 ack'd packets
+TRACE:one_way_ack:sent 500 ack'd packets
+pi-echo.c:pi_echo:69:FATAL syscall error: "pi connection closed.  cleaning up\n"
+	perror reason: read: Device not configured

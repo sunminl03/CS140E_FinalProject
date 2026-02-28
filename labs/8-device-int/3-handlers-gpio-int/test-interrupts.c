@@ -15,7 +15,23 @@
 /*************** You don't need to modify this first part ********** 
  *
  */
+// enum { 
+//     ARM_Timer_Base      = 0x2000B400,
+//     ARM_Timer_Load      = ARM_Timer_Base + 0x00, // p196
+//     ARM_Timer_Value     = ARM_Timer_Base + 0x04, // read-only
+//     ARM_Timer_Control   = ARM_Timer_Base + 0x08,
 
+//     ARM_Timer_IRQ_Clear = ARM_Timer_Base + 0x0c,
+
+//     // Errata fo p198: 
+//     // neither are register 0x40C raw is 0x410, masked is 0x414
+//     ARM_Timer_IRQ_Raw   = ARM_Timer_Base + 0x10,
+//     ARM_Timer_IRQ_Masked   = ARM_Timer_Base + 0x14,
+
+//     ARM_Timer_Reload    = ARM_Timer_Base + 0x18,
+//     ARM_Timer_PreDiv    = ARM_Timer_Base + 0x1c,
+//     ARM_Timer_Counter   = ARM_Timer_Base + 0x20,
+// };
 
 // initialization routine
 typedef void (*init_fn_t)(void);
@@ -106,7 +122,19 @@ volatile int n_falling;
  *  2. check if it was a falling edge: return 1 if so, 0 otherwise
  */
 int falling_handler(uint32_t pc) {
-    todo("implement this: return 0 if no rising int\n");
+    // todo("implement this: return 0 if no rising int\n");
+    int result = 0;
+    if (gpio_event_detected(in_pin)) {
+        dev_barrier();
+        if (!gpio_read(in_pin)) {
+            result = 1;
+            n_falling += 1;
+            gpio_event_clear(in_pin);
+        }
+        dev_barrier();
+    }
+    
+    return result;
 }
 
 // initialize for a falling edge
@@ -135,7 +163,19 @@ volatile int n_rising;
  *  2. check if it was a rising edge: return 1 if so, 0 otherwise
  */
 int rising_handler(uint32_t pc) {
-    todo("implement this: return 0 if no rising int\n");
+    // todo("implement this: return 0 if no rising int\n");
+    int result = 0;
+    if (gpio_event_detected(in_pin)) {
+        dev_barrier();
+        if (gpio_read(in_pin)) {
+            result = 1;
+            n_rising += 1;
+            gpio_event_clear(in_pin);
+        }
+        dev_barrier();
+    }
+    
+    return result;
 }
 
 static void rising_init_fn(void) {
@@ -184,12 +224,20 @@ void rise_fall_init(void) {
  */
 int timer_test_handler(uint32_t pc) {
     dev_barrier();
+    int result = 0;
 
     // should look very similar to the timer interrupt handler.
-    todo("implement this by stealing pieces from 4-interrupts/0-timer-int");
-
+    // todo("implement thi s by stealing pieces from 4-interrupts/0-timer-int");
+    unsigned pending = GET32(IRQ_basic_pending);
     dev_barrier();
-    return 1;
+    if ((pending & ARM_Timer_IRQ) == 1) {
+        n_interrupt += 1;
+        result = 1;
+        dev_barrier();
+        PUT32(ARM_Timer_IRQ_Clear, 1);
+        dev_barrier();
+    }
+    return result;
 }
 
 void timer_init_fn(void) {

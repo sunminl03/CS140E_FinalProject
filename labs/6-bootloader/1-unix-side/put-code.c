@@ -201,7 +201,8 @@ void simple_boot(int fd, uint32_t boot_addr, const uint8_t *buf, unsigned n) {
     // all implementations should have the same message: same bytes,
     // same crc32: cross-check these values to detect if your <read_file> 
     // is busted.
-    trace("simple_boot: sending %d bytes, crc32=%x\n", n, crc32(buf,n));
+    uint32_t crc32_unix= crc32(buf,n);
+    trace("simple_boot: sending %d bytes, crc32=%x\n", n, crc32_unix);
     boot_output("waiting for a start\n");
 
     // NOTE: only call <get_op> to assign to the <op> var.
@@ -234,19 +235,41 @@ void simple_boot(int fd, uint32_t boot_addr, const uint8_t *buf, unsigned n) {
     //      same value as an opcode and get hijacked.
 
     // 1. reply to the GET_PROG_INFO
-    todo("reply to GET_PROG_INFO");
+    // at this point, op == GET_PROG_INFO 
+    trace_put32(fd, PUT_PROG_INFO);
+    // address to put the code in
+    trace_put32(fd, boot_addr);
+    // the size of the code
+    trace_put32(fd, (uint32_t)n);
+    // checksum
+    trace_put32(fd, crc32_unix);
+    
 
     // 2. drain any extra GET_PROG_INFOS
-    todo("drain any extra GET_PROG_INFOS");
+    while((op = get_op(fd)) == GET_PROG_INFO) {
+        output("draining any extra GET_PROG_INFOS");
+        // have to remove just one byte since if not aligned, stays not aligned
+        trace_get8(fd);
+    } 
 
     // 3. check that we received a GET_CODE
-    todo("check that we received a GET_CODE");
+    assert(op == GET_CODE);
+
+    // while((op = get_op(fd)) != GET_CODE);
+    uint32_t crc32_pi = trace_get32(fd);
+    if (crc32_pi != crc32_unix) {
+        panic("checksum do not match");
+    }
 
     // 4. handle it: send a PUT_CODE + the code.
-    todo("send PUT_CODE + the code in <buf>");
+    trace_put32(fd, PUT_CODE);
+    
+    for (int i = 0; i < n; i++) {
+        trace_put8(fd, buf[i]);
+    }
 
     // 5. Wait for BOOT_SUCCESS
-    todo("wait for BOOT_SUCCESS");
+    while((op = get_op(fd)) != BOOT_SUCCESS);
 
     boot_output("bootloader: Done.\n");
 }

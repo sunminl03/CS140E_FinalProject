@@ -16,6 +16,20 @@ int brk_verbose_p = 0;
 
 static void A_terminated(uint32_t ret);
 
+// static inline int sys_lock_try(volatile int *l) {
+//         // in rpi-inline-asm.h
+//         uint32_t cpsr = cpsr_get();
+        
+//         // libpi/include/cpsr-util.h
+//         if(mode_get(cpsr) == USER_MODE)
+//             return syscall_invoke_asm(SYS_TRYLOCK, l);
+//         else
+//             // todo("just call the trylock directly\n");
+//             return *l;
+
+// }
+
+
 
 // invoked from user level: 
 //   syscall(sysnum, arg0, arg1, ...)
@@ -35,6 +49,9 @@ static int syscall_handler_full(regs_t *r) {
     // pc = address of instruction right after 
     // the system call.
     uint32_t pc = r->regs[15];      
+    int result;
+    int tmp;
+    volatile int *l = (volatile int*)arg0;
 
     switch(sys_num) {
     case SYS_RESUME:
@@ -42,7 +59,12 @@ static int syscall_handler_full(regs_t *r) {
             switchto((void*)arg0);
             panic("not reached\n");
     case SYS_TRYLOCK:
-        panic("not handling yet\n");
+        if (*l == 0) {
+            *l = 1;
+            return 1;
+        } else {
+            return 0;
+        }
 
     case SYS_TEST:
         printk("running empty syscall with arg=%d\n", arg0);
@@ -58,6 +80,7 @@ static int syscall_handler_full(regs_t *r) {
 //     - if B() succeeds, then run the rest of A() to completion.  
 //     - if B() returns 0, it couldn't complete w current state:
 //       resume A() and switch on next instruction.
+
 static void single_step_handler_full(regs_t *r) {
     // assume we only get breakpoint faults.
     if(!brkpt_fault_p())
@@ -69,14 +92,46 @@ static void single_step_handler_full(regs_t *r) {
 
 
     // TODO: you'll have to add code to do the switching here.
-    output("single-step handler: inst=%d: A:pc=%x\n", n,pc);
+    // 
 
-    // recall: the weird way single step works: run the instruction 
-    // at address <pc>, by setting up a mismatch fault for any other
-    // <pc> value.
-    brkpt_mismatch_set(pc);
+    // if we are interleaving, we need to switch to B after n instructions
+    if (checker->interleaving_p) {
+        // trace everytime we are raising exception
+        output("single-step handler: inst=%d: A:pc=%x\n", n,pc);
+        // if we ran n number of A instructions, run B 
+        if (n == checker->switch_on_inst_n) {
+            if (checker->B((void*)checker)) { 
+                // at this point, B is done running 
+                // 
+                checker->switch_addr = pc; 
+                checker->switched_p = 1;
+                checker->nswitches += 1;
+                brkpt_mismatch_stop();
+                switchto(r);
+            } else {
+                checker->switch_on_inst_n++;
+                checker->skips++;
+            }
+
+        }
+        brkpt_mismatch_set(pc);
+        switchto(r);
+        
+    } else {
+        output("no interleaved: single-step handler: inst=%d: A:pc=%x\n", n,pc);
+        if (pc == (uint32_t)A_terminated) {
+            brkpt_mismatch_stop();
+        
+        }
+        brkpt_mismatch_set(pc);
+        switchto(r);
+    }
+    // go back to next instruction in A 
+    // switchto(r);
+
+
     // switch to back.
-    switchto(r);
+    
 }
 
 // registers saved when we started: recall similar in <rpi-thread.c>
@@ -134,6 +189,7 @@ static uint32_t run_A_at_userlevel(checker_t *c) {
     // 4. context switch to <r> and save current execution
     // state in <start_regs> [similar to <rpi-thread.c>
     // when we started the threads package.
+    brkpt_mismatch_set(r.regs[REGS_PC]);  
     switchto_cswitch(&start_regs, &r);
 
     // 5. At this point A() finished execution.   We got 
@@ -160,6 +216,8 @@ int check(checker_t *c) {
     full_except_install(0);
     full_except_set_syscall(syscall_handler_full);
     full_except_set_prefetch(single_step_handler_full);
+    // initialize checks
+    c->nswitches = 0;
 
     // show how to the interface works by testing
     // A(),B() sequentially multiple times.
@@ -222,7 +280,26 @@ int check(checker_t *c) {
     //  }
     // 
     //  return 0 if there were errors.
-    todo("implement true interleaving!\n");
+    // todo("implement true interleaving!\n");
+    c->nerrors = 0;
+    c->interleaving_p = 1;
+    for (int i = 1; ; i++) {
+        c->switched_p = 0;
+        c->inst_count = 0;
+        c->init(c);
+        c->switch_on_inst_n = i; 
+        c->ntrials++;
+        run_A_at_userlevel(c);
+        // if A ran till the end before switching to B, break. 
+        if (!c->switched_p) {
+            break;
+        }
+        // check status of c to see if we failed 
+        if (!c->check(c)) {
+            printk("ERROR: check failed when switched on address  instructions\n");
+            c->nerrors++;
+        }
+    }
 
-    return 1;
+    return c->nerrors == 0;
 }

@@ -241,9 +241,12 @@ void notmain(void) {
     // 4. turn MMU on/off, checking that it worked.
     trace("about to enable\n");
     for(int i = 0; i < 10; i++) {
+        // trace("before assert\n");
         assert(!staff_mmu_is_enabled());
+        // trace("after assert\n");
         // mmu.h: you'll implement next vm lab.  
         staff_mmu_enable();
+        // trace("after assert\n");
 
         // this uses: stack, code, data, BCM.
         if(staff_mmu_is_enabled())

@@ -6,9 +6,9 @@
 # NOTE: this variable and many of the others are not required:
 # we use them to (try to) add clarify.  The only real requirement
 # is specifying what depends on what (the rules from "all:" to EOF).
-PROG_SRC := 1-blink.c 2-blink.c 3-loopback.c
+PROG_SRC := 1-blink.c 2-blink.c 3-loopback.c 4-act-blink.c 5-all.c ex_bitbang.c
 
-# 2) For each PROG_SRC X.c we build a X.bin
+# 2) For each PROG_SRC X.c we build a X.bins
 PROGS := $(PROG_SRC:.c=.bin)
 
 # These common object files are linked into every program

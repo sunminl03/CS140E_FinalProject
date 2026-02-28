@@ -1,14 +1,22 @@
 #include "rpi-asm.h"
 
 MK_FN(switchto_user_asm)
-    b staff_switchto_user_asm
+    @ load into registers
+    @b staff_switchto_user_asm
+    mov r13, r0
+    ldm r0, {r0-r14}^
+    add r13, r13, #60 @pc
+    rfe r13
 
 @ NOTE:  set <cpsr> using the following instructon so GNU
 @ assembler will set all the bits.  get mismatches otherwise
 @   msr   cpsr_cxsf, <reg>
 MK_FN(switchto_priv_asm)
-    b staff_switchto_priv_asm
-    asm_not_reached();
+    ldr     r1, [r0, #64]
+    msr     cpsr_cxsf, r1
+    @prefetch_flush(r1)
+    ldm   r0, {r0-r15}
+    
 
 @ void priv_get_sp_lr_asm(uint32_t mode, uint32_t *sp, uint32_t *lr);
 @   - assumes caller is at privileged mode [we could check this]
@@ -16,9 +24,23 @@ MK_FN(switchto_priv_asm)
 @   - sp pointer in r1
 @   - lr pointer in r2
 @
+@MK_FN(priv_get_sp_lr_asm)
+@    b staff_priv_get_sp_lr_asm
+@   asm_not_reached();
+
 MK_FN(priv_get_sp_lr_asm)
-    b staff_priv_get_sp_lr_asm
-    asm_not_reached();
+    mrs r3, cpsr 
+    msr cpsr_c, r0
+    prefetch_flush(r12)
+
+    str sp, [r1]
+    str lr, [r2]
+   @ mov r1, sp
+   @ mov r2, lr
+
+    msr cpsr_c, r3
+    prefetch_flush(r12)
+    bx lr
 
 @ you'll have to write this, but it should mirror your other save
 @ routines.

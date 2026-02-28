@@ -152,6 +152,7 @@ void gpio_pud_off(unsigned pin);
 // For today: we don't do anything besides inf loop (see panic:libpi.c).  
 // see: libpi.c
 void panic(const char *msg, ...);
+void gpio_set_function(unsigned pin, gpio_func_t func);
 
 // macro hack
 #define gpio_assert(bool) do { if(!(bool)) panic(# bool); } while(0)

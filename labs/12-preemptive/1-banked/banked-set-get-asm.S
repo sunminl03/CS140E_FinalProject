@@ -22,19 +22,40 @@ MK_FN(cps_user_sp_get)
 @ set the USER sp
 @   - as above: use <cpsr> to switch to SYSTEM (SYS_MODE) and back.
 MK_FN(cps_user_sp_set)
-    asm_todo(implement this code)
+    cps #SYS_MODE
+    prefetch_flush(r1);
+    
+    mov sp, r0
+
+    cps #SUPER_MODE
+    prefetch_flush(r1);
+
     bx lr
 
 @ get the USER lr 
 @   - as above: use <cpsr> to switch to SYSTEM (SYS_MODE) and back.
 MK_FN(cps_user_lr_get)
-    asm_todo(implement this code)
+    cps #SYS_MODE
+    prefetch_flush(r1)
+
+    mov r0, lr 
+
+    cps #SUPER_MODE
+    prefetch_flush(r1);
+
     bx lr
 
 @ set USER lr 
 @   - as above: use <cpsr> -> SYSTEM -> back.
 MK_FN(cps_user_lr_set)
-    asm_todo(implement this code)
+    cps #SYS_MODE
+    prefetch_flush(r1)
+
+    mov lr, r0
+
+    cps #SUPER_MODE
+    prefetch_flush(r1);
+
     bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -51,29 +72,33 @@ MK_FN(mem_user_sp_get)
 
 @ address to a uint32_t word is passed in r0
 MK_FN(mem_user_sp_set)
-    asm_todo("implement this using ldm + caret operator")
+    @ caret gets sp from user mode 
+    @ set user sp with r0
+    ldm r0, {sp}^
     bx lr
 
 @ address to a uint32_t word is passed in r0
 MK_FN(mem_user_lr_get)
-    asm_todo("implement this code");
+    stm r0, {lr}^
     bx lr
 
 @ address to a uint32_t word is passed in r0
 MK_FN(mem_user_lr_set)
-    asm_todo("implement this code")
+    @ caret gets sp from user mode 
+    @ set user sp with r0
+    ldm r0, {lr}^
     bx lr
 
 @ address to an array with two uint32_t words 
 @ is passed in r0
 MK_FN(mem_user_sp_lr_get)
-    asm_todo("implement this")
+    stm r0, {sp, lr}^
     bx lr
 
 @ address to an array with two uint32_t words 
 @ is passed in r0
 MK_FN(mem_user_sp_lr_set)
-    asm_todo("implement this")
+    ldm r0, {sp, lr}^
     bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -84,9 +109,29 @@ MK_FN(mem_user_sp_lr_set)
 @    - address to hold sp in r1
 @    - address to hold lr in r2
 MK_FN(mode_get_lr_sp_asm)
-    asm_todo("implement this")
+    msr cpsr, r0
+    prefetch_flush(r3)
+
+    stm r1, {sp}^
+    stm r2, {lr}^
+   @ mov r1, sp
+   @ mov r2, lr
+
+    mov r0,  #SUPER_MODE
+    msr cpsr, r0
+    prefetch_flush(r3)
     bx lr
 
 MK_FN(mode_set_lr_sp_asm)
-    asm_todo("implement this")
+    msr cpsr, r0
+    prefetch_flush(r3)
+
+    ldm r1, {sp}^
+    ldm r2, {lr}^
+    @mov sp, r1
+    @mov lr, r2
+
+    mov r0,  #SUPER_MODE
+    msr cpsr, r0
+    prefetch_flush(r3)
     bx lr

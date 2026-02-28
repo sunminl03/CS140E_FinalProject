@@ -201,6 +201,7 @@ void notmain(void) {
     assert(cps_user_lr_get() == LR);
 
     // can pass any mode, but we know the answer for this one.
+    // trace("part 4:before mode_get_lr_sp_asm");
     mode_get_lr_sp_asm(SYS_MODE, &sp, &lr);
     trace("sp=%x, lr=%x\n", sp, lr);
     assert(lr == LR);

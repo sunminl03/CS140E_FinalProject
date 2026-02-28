@@ -1,0 +1,328 @@
+opened tty port </dev/cu.usbserial-310>.
+pi-install: tty-usb=</dev/cu.usbserial-310> program=<./gprof.bin> about to boot
+TRACE:simple_boot: sending 6912 bytes, crc32=d1a35425
+waiting for a start
+putting code
+bootloader: Done.
+listening on ttyusb=</dev/cu.usbserial-310>
+about to install interrupt handlers
+setting up timer interrupts
+gonna enable ints globally!
+iter=0: cnt = 0, period = 0usec, 0x0
+iter=1: cnt = 1, period = 0usec, 0x0
+iter=2: cnt = 2, period = 4112usec, 0x1010
+iter=3: cnt = 3, period = 4112usec, 0x1010
+iter=4: cnt = 4, period = 4112usec, 0x1010
+iter=5: cnt = 4, period = 4112usec, 0x1010
+iter=6: cnt = 5, period = 4112usec, 0x1010
+iter=7: cnt = 6, period = 4112usec, 0x1010
+iter=8: cnt = 7, period = 4112usec, 0x1010
+iter=9: cnt = 8, period = 4112usec, 0x1010
+pc=0x9080 count=3
+iter=10: cnt = 9, period = 4112usec, 0x1010
+iter=11: cnt = 10, period = 4112usec, 0x1010
+iter=12: cnt = 11, period = 4112usec, 0x1010
+iter=13: cnt = 12, period = 4112usec, 0x1010
+iter=14: cnt = 13, period = 4112usec, 0x1010
+iter=15: cnt = 14, period = 4112usec, 0x1010
+iter=16: cnt = 15, period = 4112usec, 0x1010
+iter=17: cnt = 16, period = 4112usec, 0x1010
+iter=18: cnt = 17, period = 4112usec, 0x1010
+iter=19: cnt = 18, period = 4112usec, 0x1010
+pc=0x9010 count=3
+pc=0x9078 count=3
+pc=0x907c count=4
+pc=0x9080 count=5
+iter=20: cnt = 20, period = 8425usec, 0x20e9
+iter=21: cnt = 20, period = 8425usec, 0x20e9
+iter=22: cnt = 21, period = 3911usec, 0xf47
+iter=23: cnt = 22, period = 4112usec, 0x1010
+iter=24: cnt = 23, period = 4112usec, 0x1010
+iter=25: cnt = 24, period = 4112usec, 0x1010
+iter=26: cnt = 25, period = 4112usec, 0x1010
+iter=27: cnt = 26, period = 4112usec, 0x1010
+iter=28: cnt = 27, period = 4112usec, 0x1010
+iter=29: cnt = 28, period = 4112usec, 0x1010
+pc=0x802c count=3
+pc=0x9010 count=5
+pc=0x9078 count=4
+pc=0x907c count=5
+pc=0x9080 count=7
+iter=30: cnt = 30, period = 10519usec, 0x2917
+iter=31: cnt = 31, period = 1817usec, 0x719
+iter=32: cnt = 32, period = 4112usec, 0x1010
+iter=33: cnt = 33, period = 4112usec, 0x1010
+iter=34: cnt = 34, period = 4112usec, 0x1010
+iter=35: cnt = 35, period = 4112usec, 0x1010
+iter=36: cnt = 36, period = 4112usec, 0x1010
+iter=37: cnt = 37, period = 4112usec, 0x1010
+iter=38: cnt = 38, period = 4112usec, 0x1010
+iter=39: cnt = 39, period = 4112usec, 0x1010
+pc=0x802c count=5
+pc=0x9004 count=4
+pc=0x9010 count=8
+pc=0x9078 count=5
+pc=0x907c count=5
+pc=0x9080 count=9
+iter=40: cnt = 41, period = 10170usec, 0x27ba
+iter=41: cnt = 42, period = 2166usec, 0x876
+iter=42: cnt = 43, period = 4112usec, 0x1010
+iter=43: cnt = 44, period = 4112usec, 0x1010
+iter=44: cnt = 45, period = 4112usec, 0x1010
+iter=45: cnt = 46, period = 4112usec, 0x1010
+iter=46: cnt = 47, period = 4112usec, 0x1010
+iter=47: cnt = 48, period = 4112usec, 0x1010
+iter=48: cnt = 49, period = 4112usec, 0x1010
+iter=49: cnt = 50, period = 4112usec, 0x1010
+pc=0x802c count=7
+pc=0x8e0c count=3
+pc=0x9004 count=5
+pc=0x9010 count=9
+pc=0x9078 count=6
+pc=0x907c count=6
+pc=0x9080 count=12
+iter=50: cnt = 52, period = 11489usec, 0x2ce1
+iter=51: cnt = 53, period = 847usec, 0x34f
+iter=52: cnt = 54, period = 4113usec, 0x1011
+iter=53: cnt = 55, period = 4111usec, 0x100f
+iter=54: cnt = 56, period = 4113usec, 0x1011
+iter=55: cnt = 57, period = 4111usec, 0x100f
+iter=56: cnt = 58, period = 4112usec, 0x1010
+iter=57: cnt = 59, period = 4112usec, 0x1010
+iter=58: cnt = 60, period = 4113usec, 0x1011
+iter=59: cnt = 61, period = 4112usec, 0x1010
+pc=0x802c count=8
+pc=0x8e0c count=4
+pc=0x9004 count=6
+pc=0x9010 count=9
+pc=0x9078 count=9
+pc=0x907c count=6
+pc=0x9080 count=14
+pc=0x93c0 count=4
+iter=60: cnt = 63, period = 14217usec, 0x3789
+iter=61: cnt = 64, period = 2231usec, 0x8b7
+iter=62: cnt = 65, period = 4112usec, 0x1010
+iter=63: cnt = 66, period = 4112usec, 0x1010
+iter=64: cnt = 67, period = 4112usec, 0x1010
+iter=65: cnt = 68, period = 4112usec, 0x1010
+iter=66: cnt = 69, period = 4112usec, 0x1010
+iter=67: cnt = 70, period = 4112usec, 0x1010
+iter=68: cnt = 71, period = 4112usec, 0x1010
+iter=69: cnt = 72, period = 4112usec, 0x1010
+pc=0x802c count=8
+pc=0x8e0c count=5
+pc=0x9004 count=7
+pc=0x9010 count=13
+pc=0x9078 count=10
+pc=0x907c count=7
+pc=0x9080 count=16
+pc=0x93c0 count=5
+iter=70: cnt = 74, period = 13181usec, 0x337d
+iter=71: cnt = 75, period = 3267usec, 0xcc3
+iter=72: cnt = 76, period = 4112usec, 0x1010
+iter=73: cnt = 77, period = 4112usec, 0x1010
+iter=74: cnt = 78, period = 4112usec, 0x1010
+iter=75: cnt = 79, period = 4112usec, 0x1010
+iter=76: cnt = 79, period = 4112usec, 0x1010
+iter=77: cnt = 80, period = 4112usec, 0x1010
+iter=78: cnt = 81, period = 4112usec, 0x1010
+iter=79: cnt = 82, period = 4112usec, 0x1010
+pc=0x802c count=10
+pc=0x8e0c count=6
+pc=0x9004 count=8
+pc=0x9010 count=15
+pc=0x9078 count=11
+pc=0x907c count=10
+pc=0x9080 count=16
+pc=0x93c0 count=5
+iter=80: cnt = 84, period = 16431usec, 0x402f
+iter=81: cnt = 85, period = 17usec, 0x11
+iter=82: cnt = 86, period = 4112usec, 0x1010
+iter=83: cnt = 87, period = 4112usec, 0x1010
+iter=84: cnt = 88, period = 4112usec, 0x1010
+iter=85: cnt = 89, period = 4112usec, 0x1010
+iter=86: cnt = 90, period = 4112usec, 0x1010
+iter=87: cnt = 91, period = 4112usec, 0x1010
+iter=88: cnt = 92, period = 4112usec, 0x1010
+iter=89: cnt = 93, period = 4112usec, 0x1010
+pc=0x802c count=10
+pc=0x8e0c count=7
+pc=0x9004 count=8
+pc=0x9010 count=18
+pc=0x9078 count=11
+pc=0x907c count=10
+pc=0x9080 count=21
+pc=0x93c0 count=7
+iter=90: cnt = 95, period = 15307usec, 0x3bcb
+iter=91: cnt = 96, period = 1141usec, 0x475
+iter=92: cnt = 97, period = 4112usec, 0x1010
+iter=93: cnt = 98, period = 4112usec, 0x1010
+iter=94: cnt = 99, period = 4112usec, 0x1010
+iter=95: cnt = 100, period = 4112usec, 0x1010
+iter=96: cnt = 101, period = 4112usec, 0x1010
+iter=97: cnt = 102, period = 4112usec, 0x1010
+iter=98: cnt = 103, period = 4112usec, 0x1010
+iter=99: cnt = 104, period = 4112usec, 0x1010
+pc=0x802c count=12
+pc=0x8e0c count=8
+pc=0x9004 count=8
+pc=0x9010 count=20
+pc=0x9078 count=11
+pc=0x907c count=12
+pc=0x9080 count=22
+pc=0x93c0 count=8
+iter=100: cnt = 106, period = 14885usec, 0x3a25
+iter=101: cnt = 107, period = 1563usec, 0x61b
+iter=102: cnt = 108, period = 4112usec, 0x1010
+iter=103: cnt = 109, period = 4112usec, 0x1010
+iter=104: cnt = 110, period = 4112usec, 0x1010
+iter=105: cnt = 111, period = 4112usec, 0x1010
+iter=106: cnt = 112, period = 4112usec, 0x1010
+iter=107: cnt = 113, period = 4112usec, 0x1010
+iter=108: cnt = 114, period = 4112usec, 0x1010
+iter=109: cnt = 115, period = 4112usec, 0x1010
+pc=0x802c count=13
+pc=0x8e0c count=9
+pc=0x9004 count=8
+pc=0x9010 count=21
+pc=0x9078 count=16
+pc=0x907c count=13
+pc=0x9080 count=22
+pc=0x93c0 count=10
+iter=110: cnt = 117, period = 15867usec, 0x3dfb
+iter=111: cnt = 118, period = 581usec, 0x245
+iter=112: cnt = 119, period = 4112usec, 0x1010
+iter=113: cnt = 120, period = 4112usec, 0x1010
+iter=114: cnt = 121, period = 4112usec, 0x1010
+iter=115: cnt = 122, period = 4112usec, 0x1010
+iter=116: cnt = 123, period = 4112usec, 0x1010
+iter=117: cnt = 124, period = 4112usec, 0x1010
+iter=118: cnt = 125, period = 4112usec, 0x1010
+iter=119: cnt = 126, period = 4112usec, 0x1010
+pc=0x802c count=14
+pc=0x8e0c count=10
+pc=0x9004 count=8
+pc=0x9010 count=26
+pc=0x9078 count=17
+pc=0x907c count=13
+pc=0x9080 count=23
+pc=0x93c0 count=12
+iter=120: cnt = 128, period = 16850usec, 0x41d2
+iter=121: cnt = 129, period = 3710usec, 0xe7e
+iter=122: cnt = 130, period = 4112usec, 0x1010
+iter=123: cnt = 131, period = 4113usec, 0x1011
+iter=124: cnt = 132, period = 4111usec, 0x100f
+iter=125: cnt = 133, period = 4113usec, 0x1011
+iter=126: cnt = 134, period = 4112usec, 0x1010
+iter=127: cnt = 135, period = 4111usec, 0x100f
+iter=128: cnt = 136, period = 4113usec, 0x1011
+iter=129: cnt = 137, period = 4112usec, 0x1010
+pc=0x802c count=14
+pc=0x8e0c count=11
+pc=0x9004 count=9
+pc=0x9010 count=27
+pc=0x9078 count=20
+pc=0x907c count=13
+pc=0x9080 count=27
+pc=0x93c0 count=12
+iter=130: cnt = 139, period = 13807usec, 0x35ef
+iter=131: cnt = 140, period = 2641usec, 0xa51
+iter=132: cnt = 141, period = 4112usec, 0x1010
+iter=133: cnt = 142, period = 4112usec, 0x1010
+iter=134: cnt = 143, period = 4112usec, 0x1010
+iter=135: cnt = 144, period = 4112usec, 0x1010
+iter=136: cnt = 145, period = 4112usec, 0x1010
+iter=137: cnt = 146, period = 4112usec, 0x1010
+iter=138: cnt = 147, period = 4112usec, 0x1010
+iter=139: cnt = 148, period = 4112usec, 0x1010
+pc=0x802c count=14
+pc=0x8e0c count=12
+pc=0x9004 count=10
+pc=0x9010 count=29
+pc=0x9078 count=21
+pc=0x907c count=14
+pc=0x9080 count=29
+pc=0x93c0 count=14
+iter=140: cnt = 150, period = 14965usec, 0x3a75
+iter=141: cnt = 151, period = 1483usec, 0x5cb
+iter=142: cnt = 152, period = 4112usec, 0x1010
+iter=143: cnt = 153, period = 4112usec, 0x1010
+iter=144: cnt = 154, period = 4112usec, 0x1010
+iter=145: cnt = 155, period = 4112usec, 0x1010
+iter=146: cnt = 156, period = 4112usec, 0x1010
+iter=147: cnt = 157, period = 4112usec, 0x1010
+iter=148: cnt = 158, period = 4112usec, 0x1010
+iter=149: cnt = 159, period = 4112usec, 0x1010
+pc=0x802c count=16
+pc=0x8e0c count=13
+pc=0x9004 count=11
+pc=0x9010 count=30
+pc=0x9078 count=24
+pc=0x907c count=14
+pc=0x9080 count=32
+pc=0x93c0 count=14
+iter=150: cnt = 161, period = 16124usec, 0x3efc
+iter=151: cnt = 162, period = 324usec, 0x144
+iter=152: cnt = 163, period = 4112usec, 0x1010
+iter=153: cnt = 164, period = 4112usec, 0x1010
+iter=154: cnt = 165, period = 4112usec, 0x1010
+iter=155: cnt = 166, period = 4112usec, 0x1010
+iter=156: cnt = 167, period = 4112usec, 0x1010
+iter=157: cnt = 168, period = 4112usec, 0x1010
+iter=158: cnt = 169, period = 4112usec, 0x1010
+iter=159: cnt = 170, period = 4112usec, 0x1010
+pc=0x802c count=17
+pc=0x8e0c count=14
+pc=0x9004 count=11
+pc=0x9010 count=32
+pc=0x9078 count=26
+pc=0x907c count=14
+pc=0x9080 count=36
+pc=0x93c0 count=15
+iter=160: cnt = 172, period = 17194usec, 0x432a
+iter=161: cnt = 173, period = 3366usec, 0xd26
+iter=162: cnt = 174, period = 4112usec, 0x1010
+iter=163: cnt = 175, period = 4112usec, 0x1010
+iter=164: cnt = 176, period = 4112usec, 0x1010
+iter=165: cnt = 177, period = 4112usec, 0x1010
+iter=166: cnt = 178, period = 4112usec, 0x1010
+iter=167: cnt = 179, period = 4112usec, 0x1010
+iter=168: cnt = 180, period = 4112usec, 0x1010
+iter=169: cnt = 181, period = 4112usec, 0x1010
+pc=0x802c count=17
+pc=0x8e0c count=15
+pc=0x9004 count=12
+pc=0x9010 count=33
+pc=0x9078 count=27
+pc=0x907c count=17
+pc=0x9080 count=36
+pc=0x93c0 count=17
+iter=170: cnt = 183, period = 14240usec, 0x37a0
+iter=171: cnt = 184, period = 2208usec, 0x8a0
+iter=172: cnt = 185, period = 4112usec, 0x1010
+iter=173: cnt = 186, period = 4112usec, 0x1010
+iter=174: cnt = 187, period = 4112usec, 0x1010
+iter=175: cnt = 188, period = 4112usec, 0x1010
+iter=176: cnt = 189, period = 4112usec, 0x1010
+iter=177: cnt = 190, period = 4112usec, 0x1010
+iter=178: cnt = 191, period = 4112usec, 0x1010
+iter=179: cnt = 192, period = 4112usec, 0x1010
+pc=0x802c count=17
+pc=0x8e0c count=16
+pc=0x9004 count=12
+pc=0x9010 count=36
+pc=0x9078 count=29
+pc=0x907c count=18
+pc=0x9080 count=40
+pc=0x93c0 count=17
+iter=180: cnt = 194, period = 15398usec, 0x3c26
+iter=181: cnt = 195, period = 1050usec, 0x41a
+iter=182: cnt = 196, period = 4112usec, 0x1010
+iter=183: cnt = 197, period = 4112usec, 0x1010
+iter=184: cnt = 198, period = 4112usec, 0x1010
+iter=185: cnt = 199, period = 4112usec, 0x1010
+DONE!!!
+
+Saw done
+
+bootloader: pi exited.  cleaning up

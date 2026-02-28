@@ -1,0 +1,13 @@
+DEBUG:done with options: dev name=</dev/cu.usbserial-310>, pi-prog=<./0-gpio-write.bin>, trace=0
+opened tty port </dev/cu.usbserial-310>.
+DEBUG:my-install: tty-usb=</dev/cu.usbserial-310> program=<./0-gpio-write.bin>: about to boot
+TRACE:simple_boot: sending 3597 bytes, crc32=f8a369f5
+BOOT:waiting for a start
+DEBUG:PRINT_STRING:pi sent print: <<Sally Lee UART>: success: Received the program!>
+BOOT:bootloader: Done.
+about to trace: <gpio_write(20, 1)>
+TRACE:PUT32(0x2020001c)=0x100000
+done: <gpio_write(20, 1)>
+DONE!!!
+
+bootloader: pi exited.  cleaning up

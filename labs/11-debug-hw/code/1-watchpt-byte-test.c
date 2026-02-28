@@ -100,7 +100,9 @@ void notmain(void) {
     // do put8's to 0x0, 0x1, 0x2, 0x3
     // if these don't work you are not handling sub-word writes
     do_put8_test(0x0, 1);
+    // trace("done with 0\n");
     do_put8_test(0x1, 2);
+    // trace("done with 1\n");
     do_put8_test(0x2, 3);
     do_put8_test(0x3, 4);
 

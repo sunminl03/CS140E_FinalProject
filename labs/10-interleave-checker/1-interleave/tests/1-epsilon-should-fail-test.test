@@ -1,0 +1,16 @@
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+ERROR: check failed when switched on address  instructions
+tests/1-epsilon-should-fail-test.c:notmain:39:DEBUG:ERROR: Assertion `c.nerrors == c.ntrials` failed.

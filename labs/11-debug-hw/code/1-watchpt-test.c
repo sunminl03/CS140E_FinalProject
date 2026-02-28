@@ -96,6 +96,7 @@ void notmain(void) {
 
     // set watchpoint.
     trace("setting watchpoint for addr %p\n", null);
+    // trace("BEFORE ON\n");
     watchpt_on(null);
 
     uint32_t val = 0xfaf0faf0;

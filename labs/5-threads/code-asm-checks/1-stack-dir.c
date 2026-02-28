@@ -11,13 +11,35 @@
 //     stack pointer and compare.
 #include "rpi.h"
 
-int stack_grows_down(void) {
-    todo("implement this routine\n");
+int another_routine(void) {
+    int another_local = 5;
+    return (uintptr_t)&another_local;
+}
+void foo() {
+    
 }
 
-void notmain(void) {
-    if(stack_grows_down())
-        trace("stack grows down\n");
+int stack_grows_down(void) {
+    int local_var = 3;
+    uintptr_t ptr = (uintptr_t)&local_var;
+    uintptr_t another_ptr = another_routine();
+    if (another_ptr < ptr)
+        return 1;
     else
+        return 0;
+
+
+}
+
+
+void notmain(void) {
+    int local_var = 2;
+    foo();
+    if(stack_grows_down()) {
+        trace("stack grows down\n");
+    }
+    else {
         trace("stack grows up\n");
+    }
+        // trace("stack grows up\n");
 }

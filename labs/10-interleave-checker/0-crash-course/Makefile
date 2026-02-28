@@ -1,4 +1,4 @@
-PROGS += 0-nop1-example.c
+# PROGS += 0-nop1-example.c
 PROGS += 1-many-fn-example.c
 
 L := $(CS140E_2026_PATH)/libpi/

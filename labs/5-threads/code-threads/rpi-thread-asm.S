@@ -26,7 +26,11 @@ MK_FN(rpi_get_sp)
 @    4. load all the callee + <lr> using the sp.
 @    5. return!
 MK_FN(rpi_cswitch)
-    asm_todo("implement this")
+    push {r4-r11, lr}
+    str sp, [r0] @ store old sp in r0
+    mov sp, r1 @ sp now points to new sp
+    pop {r4-r11, lr}
+
     bx lr
 
 @ [Make sure you can answer: why do we need this
@@ -39,5 +43,9 @@ MK_FN(rpi_cswitch)
 @	- <arg> into r0
 @ 
 MK_FN(rpi_init_trampoline)
-    asm_todo("implement this")
-    bx lr
+    mov r0, r5
+    mov r1, r4
+    mov lr, r4
+    blx lr  @ after thread ends, come back here(blx). without trampoline, when thread function returns, it might jump to garbage value 
+    bl rpi_exit @ exit safely 
+

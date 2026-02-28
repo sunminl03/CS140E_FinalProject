@@ -19,8 +19,11 @@ MK_FN(syscall_illegal)
 @
 @ utility routine:
 @   1. switch to user mode, 
+@ cps 0b10000
 @   2. set setting <sp> to <stack>
+@ mv sp r1
 @   3. jump to the address in <pc> 
+@ b r0
 @ 
 @ recall:
 @   - pc is passed in r0
@@ -31,4 +34,7 @@ MK_FN(syscall_illegal)
 @
 @ does not return
 MK_FN(run_user_code_asm)
-    asm_not_implemented()
+    cps 0b10000
+    prefetch_flush(r5)
+    mov sp, r1
+    bx r0

@@ -1,7 +1,7 @@
 # need the makefile to give an error if this doesn't exist
 PROGS := 0-syscall.c 1-syscall.c
 COMMON_SRC := syscall-asm.S  interrupts-asm.S
-
+#1-syscall.c
 # uncomment if you want it to automatically run.
 # RUN=1
 

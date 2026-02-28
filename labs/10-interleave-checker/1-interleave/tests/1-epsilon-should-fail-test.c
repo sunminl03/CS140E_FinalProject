@@ -31,8 +31,8 @@ void notmain(void) {
     int n;
     if(check(&c)) {
         assert(!c.nerrors);
-        panic("check should have failed, trials=%d!!\n", 
-                c.ntrials);
+        panic("check should have failed, trials=%d, %d!!\n", 
+                c.ntrials, c.interleaving_p);
     } else {
         output("done checking: trials=[%d] errors=[%d]!!\n", 
                 c.ntrials, c.nerrors);

@@ -1,18 +1,37 @@
+########################################################################
+#  https://forums.raspberrypi.com/viewtopic.php?t=322718
+
+arm_freq=1150
+# arm_freq=1085
+
+gpu_freq=600
+# this is erratic
+# gpu_freq=650
+# gpu_freq=530
+
+core_freq=600
+# this is erratic
+# core_freq=650
+# core_freq=515
+
+sdram_freq=600
+# sdram_freq=533
+
+# over_voltage=2
+over_voltage=6
+
+# over_voltage_sdram=1
+over_voltage_sdram=4
+
 # gpu_mem=64
 gpu_mem=16
-
-# you can bump these up more --- note if you change core_freq
-# you'll need to change uart speed, use the pl011, or bit-bang.
-arm_freq=1000
-core_freq=250
 
 kernel=kernel.img
 kernel_address=0x8000
 
 # on the pi zero w you need this line or it won't work.
 # zhouheng sun found this!
-enable_uart=1 
+enable_uart=1
 
-# note: we changed these.
 start_file=start_cd.elf
 fixup_file=fixup_cd.dat

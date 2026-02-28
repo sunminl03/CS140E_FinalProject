@@ -5,6 +5,7 @@ PROGS += tests/1-test-one-addr.c
 PROGS += tests/1-test-two-addr.c
 PROGS += tests/2-test-lookup.c
 PROGS += tests/2-test-procmap.c
+# PROGS += tests/4-test-part4.c
 
 
 # your code will go here.
@@ -17,7 +18,7 @@ STAFF_OBJS += $(O)/staff-objs/staff-switchto-asm.o
 STAFF_OBJS += staff-mmu-asm.o  
 STAFF_OBJS += staff-mmu-except.o  
 STAFF_OBJS += staff-mmu.o  
-STAFF_OBJS += staff-pinned-vm.o
+# STAFF_OBJS += staff-pinned-vm.o
 STAFF_OBJS += $(O)/staff-objs/staff-kmalloc.o
 
 # define this if you need to give the device for your pi

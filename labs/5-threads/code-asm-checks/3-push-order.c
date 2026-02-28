@@ -24,11 +24,11 @@ void notmain() {
     if(v[2] == val2 && v[1] == val1) {
         assert(v[3] == 4);
         assert(v[0] == 1);
-        todo("what does this imply?\n");
+        trace("put value and modify pointer\n");
     } else if(v[1] == val2 && v[0] == val1) {
         assert(v[3] == 4);
         assert(v[2] == 3);
-        todo("what does this imply?\n");
+        trace("modify pointer and put value \n");
     } else 
         panic("unexpected result\n");
 }

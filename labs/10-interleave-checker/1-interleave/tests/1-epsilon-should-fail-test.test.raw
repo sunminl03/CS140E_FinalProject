@@ -1,0 +1,173 @@
+DEBUG:done with options: dev name=</dev/cu.usbserial-310>, pi-prog=<./tests/1-epsilon-should-fail-test.bin>, trace=0
+opened tty port </dev/cu.usbserial-310>.
+DEBUG:my-install: tty-usb=</dev/cu.usbserial-310> program=<./tests/1-epsilon-should-fail-test.bin>: about to boot
+TRACE:simple_boot: sending 15104 bytes, crc32=37cddc4f
+BOOT:waiting for a start
+DEBUG:PRINT_STRING:pi sent print: <<Sally Lee UART>: success: Received the program!>
+BOOT:bootloader: Done.
+ENABLE
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8350
+single-step handler: inst=3: A:pc=0x8350
+single-step handler: inst=4: A:pc=0x8350
+single-step handler: inst=5: A:pc=0x8350
+single-step handler: inst=6: A:pc=0x8350
+single-step handler: inst=7: A:pc=0x8350
+single-step handler: inst=8: A:pc=0x8350
+single-step handler: inst=9: A:pc=0x8350
+single-step handler: inst=10: A:pc=0x8350
+single-step handler: inst=1: A:pc=0x8350
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+single-step handler: inst=6: A:pc=0x8364
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+single-step handler: inst=6: A:pc=0x8364
+single-step handler: inst=7: A:pc=0x8368
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+single-step handler: inst=6: A:pc=0x8364
+single-step handler: inst=7: A:pc=0x8368
+single-step handler: inst=8: A:pc=0x8384
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+single-step handler: inst=6: A:pc=0x8364
+single-step handler: inst=7: A:pc=0x8368
+single-step handler: inst=8: A:pc=0x8384
+single-step handler: inst=9: A:pc=0x8388
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+single-step handler: inst=6: A:pc=0x8364
+single-step handler: inst=7: A:pc=0x8368
+single-step handler: inst=8: A:pc=0x8384
+single-step handler: inst=9: A:pc=0x8388
+single-step handler: inst=10: A:pc=0x838c
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+single-step handler: inst=6: A:pc=0x8364
+single-step handler: inst=7: A:pc=0x8368
+single-step handler: inst=8: A:pc=0x8384
+single-step handler: inst=9: A:pc=0x8388
+single-step handler: inst=10: A:pc=0x838c
+single-step handler: inst=11: A:pc=0x8390
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+single-step handler: inst=6: A:pc=0x8364
+single-step handler: inst=7: A:pc=0x8368
+single-step handler: inst=8: A:pc=0x8384
+single-step handler: inst=9: A:pc=0x8388
+single-step handler: inst=10: A:pc=0x838c
+single-step handler: inst=11: A:pc=0x8390
+single-step handler: inst=12: A:pc=0x8394
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+single-step handler: inst=6: A:pc=0x8364
+single-step handler: inst=7: A:pc=0x8368
+single-step handler: inst=8: A:pc=0x8384
+single-step handler: inst=9: A:pc=0x8388
+single-step handler: inst=10: A:pc=0x838c
+single-step handler: inst=11: A:pc=0x8390
+single-step handler: inst=12: A:pc=0x8394
+single-step handler: inst=13: A:pc=0x8398
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+single-step handler: inst=6: A:pc=0x8364
+single-step handler: inst=7: A:pc=0x8368
+single-step handler: inst=8: A:pc=0x8384
+single-step handler: inst=9: A:pc=0x8388
+single-step handler: inst=10: A:pc=0x838c
+single-step handler: inst=11: A:pc=0x8390
+single-step handler: inst=12: A:pc=0x8394
+single-step handler: inst=13: A:pc=0x8398
+single-step handler: inst=14: A:pc=0x81b0
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+single-step handler: inst=6: A:pc=0x8364
+single-step handler: inst=7: A:pc=0x8368
+single-step handler: inst=8: A:pc=0x8384
+single-step handler: inst=9: A:pc=0x8388
+single-step handler: inst=10: A:pc=0x838c
+single-step handler: inst=11: A:pc=0x8390
+single-step handler: inst=12: A:pc=0x8394
+single-step handler: inst=13: A:pc=0x8398
+single-step handler: inst=14: A:pc=0x81b0
+single-step handler: inst=15: A:pc=0x81b4
+ERROR: check failed when switched on address  instructions
+single-step handler: inst=1: A:pc=0x8350
+single-step handler: inst=2: A:pc=0x8354
+single-step handler: inst=3: A:pc=0x8358
+single-step handler: inst=4: A:pc=0x835c
+single-step handler: inst=5: A:pc=0x8360
+single-step handler: inst=6: A:pc=0x8364
+single-step handler: inst=7: A:pc=0x8368
+single-step handler: inst=8: A:pc=0x8384
+single-step handler: inst=9: A:pc=0x8388
+single-step handler: inst=10: A:pc=0x838c
+single-step handler: inst=11: A:pc=0x8390
+single-step handler: inst=12: A:pc=0x8394
+single-step handler: inst=13: A:pc=0x8398
+single-step handler: inst=14: A:pc=0x81b0
+single-step handler: inst=15: A:pc=0x81b4
+done checking: trials=[0] errors=[15]!!
+tests/1-epsilon-should-fail-test.c:notmain:39:DEBUG:ERROR: Assertion `c.nerrors == c.ntrials` failed.
+DONE!!!
+
+bootloader: pi exited.  cleaning up

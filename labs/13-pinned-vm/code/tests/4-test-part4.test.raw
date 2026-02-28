@@ -1,0 +1,24 @@
+DEBUG:done with options: dev name=</dev/cu.usbserial-310>, pi-prog=<./tests/4-test-part4.bin>, trace=0
+opened tty port </dev/cu.usbserial-310>.
+DEBUG:my-install: tty-usb=</dev/cu.usbserial-310> program=<./tests/4-test-part4.bin>: about to boot
+TRACE:simple_boot: sending 18684 bytes, crc32=6d707a47
+BOOT:waiting for a start
+DEBUG:PRINT_STRING:pi sent print: <<Sally Lee UART>: success: Received the program!>
+BOOT:bootloader: Done.
+pinned-vm.c:pin_mmu_sec:81:DEBUG:about to map 0x0->0x0
+pinned-vm.c:pin_mmu_sec:81:DEBUG:about to map 0x100000->0x100000
+pinned-vm.c:pin_mmu_sec:81:DEBUG:about to map 0x7f00000->0x7f00000
+pinned-vm.c:pin_mmu_sec:81:DEBUG:about to map 0x8f00000->0x8f00000
+pinned-vm.c:pin_mmu_sec:81:DEBUG:about to map 0x20000000->0x20000000
+pinned-vm.c:pin_mmu_sec:81:DEBUG:about to map 0x20100000->0x20100000
+pinned-vm.c:pin_mmu_sec:81:DEBUG:about to map 0x20200000->0x20200000
+DATA ABORT: pc=0x802c dfar=0x104000 dfsr=0x29 fs=0x9 (Domain fault (section))
+LOAD ok after handler: v=0x12345678
+DATA ABORT: pc=0x8024 dfar=0x104000 dfsr=0x829 fs=0x9 (Domain fault (section))
+STORE ok after handler: *p=0xdeadbeef
+PREFETCH ABORT: pc=0x104008 ifar=0x104008 ifsr=0x9 fs=0x9 (Domain fault (section))
+JUMP ok after handler
+TRACE:notmain:ALL PART4 TESTS PASSED
+DONE!!!
+
+bootloader: pi exited.  cleaning up
