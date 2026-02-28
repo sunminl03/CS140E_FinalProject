@@ -47,6 +47,7 @@
 #define output(msg...) fprintf(stderr, ##msg)
 #define trace(fmt, args...) fprintf(stderr, "TRACE:" fmt, ##args)
 
+
 /* Compile-time assertion: can only be used in a function. */
 #define AssertNow(x) switch(1) { case (x): case 0: ; }
 
