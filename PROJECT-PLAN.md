@@ -501,6 +501,78 @@ Each phase builds incrementally and can be tested independently.
 
 ---
 
+## Relay Pi: Linux vs Bare-Metal
+
+### **Why Linux is Required**
+
+The relay Pi **must run Linux** because:
+
+1. **TAP Interface Requirement**:
+   - TAP interfaces are a **Linux kernel feature**
+   - Created via `/dev/net/tun` device
+   - Requires kernel networking stack support
+   - Bare-metal has no kernel, so no TAP support
+
+2. **Standard Tool Integration**:
+   - Goal: Use `ping`, `arping`, `nc` from relay Pi
+   - These tools require full OS networking stack
+   - Linux provides ARP table, routing, socket APIs
+   - Bare-metal can't run these standard tools
+
+3. **Network Stack Integration**:
+   - TAP makes bare-metal Pi appear as real IP node
+   - Linux handles ARP, routing, IP configuration
+   - Bare-metal can't provide this integration
+
+### **Could Relay Pi Be Bare-Metal?**
+
+**Short answer: No, not for this architecture.**
+
+**Alternative architectures (if you wanted bare-metal relay):**
+
+1. **UART Bridge** (more complex):
+   ```
+   Host Machine (Linux/Mac)
+     |
+   UART/USB Serial
+     |
+   Bare-Metal Relay Pi
+     |
+   NRF #2 ←→ NRF #1 ←→ Bare-Metal Pi Zero W
+   ```
+   - Relay Pi forwards frames via UART
+   - Host machine needs custom bridge program
+   - Can't use standard tools directly
+   - More complex, less useful
+
+2. **Dual NRF Relay** (even more complex):
+   - Relay Pi has two NRFs
+   - Forwards between them
+   - Still need host machine for TAP
+   - Doesn't solve the problem
+
+### **Recommendation: Use Linux on Relay Pi**
+
+**Benefits:**
+- ✅ Standard tools work (`ping`, `arping`, `nc`)
+- ✅ TAP interface integration
+- ✅ Can SSH from MacBook to relay Pi
+- ✅ Easier debugging with Wireshark
+- ✅ Standard Linux networking stack
+
+**What You Need:**
+- Raspberry Pi running Linux (Raspberry Pi OS)
+- NRF driver for Linux (port your code or use library)
+- Root/sudo access for TAP interface
+
+**Development Workflow:**
+1. Develop bare-metal stack on Pi Zero W
+2. Test with Linux relay Pi
+3. SSH to relay Pi from your MacBook
+4. Run `ping`, `arping`, `nc` from relay Pi
+
+This is the cleanest and most useful architecture for your project.
+
 ## Plan Validation
 
 ### ✅ **Valid Aspects**
