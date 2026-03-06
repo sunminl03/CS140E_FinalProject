@@ -1,21 +1,15 @@
-###############################################################
-# Final project: simple Pi <-> laptop serial demo
-# Builds programs for serial communication and PPP frame parsing
+PROGS += tests/tests-hdlc/0-basic-encode-decode.c
+PROGS += tests/tests-hdlc/1-crc16-test.c
+PROGS += tests/tests-hdlc/2-escape-test.c
+PROGS += tests/tests-hdlc/3-fcs-verification.c
+PROGS += tests/tests-hdlc/4-edge-cases.c
+PROGS += tests/tests-hdlc/5-error-handling.c
+COMMON_SRC += hdlc_framing.c
 
-# Programs with `notmain` entry points.
-PROGS += serial_comm.c
-PROGS += ppp_test.c
-
-# Common source files (shared across programs)
-COMMON_SRC += ppp_frame.c
-
-# Use the standard bootloader script; you can change this
-# to my-install if you have your own.
-BOOTLOADER = pi-install
-
-# Set to 0 if you don't want `make run` to auto-load the binary.
+BOOTLOADER = my-install
+TTYUSB = 
 RUN = 1
+include $(CS140E_2026_PATH)/libpi/mk/Makefile.robust-v3
 
-# Pull in the shared cs140e build rules.
-include $(CS140E_2026_PATH)/libpi/mk/Makefile.robust-v2
-
+clean::
+	make -C tests clean
