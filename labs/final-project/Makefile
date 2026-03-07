@@ -5,9 +5,12 @@
 # PROGS += tests/tests-hdlc/3-fcs-verification.c
 # PROGS += tests/tests-hdlc/4-edge-cases.c
 # PROGS += tests/tests-hdlc/5-error-handling.c
-PROGS += tests/tests-hdlc/hdlc_loopback_test.c
+# PROGS += tests/tests-hdlc/hdlc_loopback_test.c
+# PROGS += tests/tests-hdlc/tests-ppp/ppp_test.c
+PROGS += tests/tests-hdlc/tests-ppp/ppp_loopback_test.c
 
 COMMON_SRC += hdlc_framing.c
+COMMON_SRC += ppp.c
 
 BOOTLOADER = my-install
 TTYUSB = 

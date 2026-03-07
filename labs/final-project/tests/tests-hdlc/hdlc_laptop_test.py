@@ -280,15 +280,20 @@ def main():
             sys.exit(1)
         print(f"Auto-detected port: {port}")
 
+    # payload = bytes([
+    #     0x48, 0x44, 0x4c, 0x43,   # "HDLC"
+    #     0x00,
+    #     0x11,
+    #     0x7e,
+    #     0x22,
+    #     0x7d,
+    #     0x33,
+    #     0x03
+    # ])
     payload = bytes([
-        0x48, 0x44, 0x4c, 0x43,   # "HDLC"
-        0x00,
-        0x11,
-        0x7e,
-        0x22,
-        0x7d,
-        0x33,
-        0x03
+    0xFF, 0x03,       # PPP address/control
+    0xC0, 0x21,       # protocol = LCP
+    0x11, 0x22, 0x33  # fake info field
     ])
     # sending encoded frame to the Pi
     tx_frame = hdlc_encode(payload)
