@@ -1,5 +1,5 @@
 
-objs/l1/l2/l3//tests/tests-hdlc/tests-ppp/ppp_loopback_test.elf:     file format elf32-littlearm
+objs/l1/l2/l3//tests/tests-ppp/ppp_loopback_test.elf:     file format elf32-littlearm
 
 
 Disassembly of section .text:
