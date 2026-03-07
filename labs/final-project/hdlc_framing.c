@@ -50,6 +50,8 @@ static const uint16_t crc16_table[256] = {
 //     return crc ^ 0xFFFF; // if payload is empty, we would get 
 // }
 
+
+// Computes the CRC-16 (FCS) for the payload.
 uint16_t hdlc_crc16(const uint8_t *data, unsigned len) {
     // Handle empty data case: return 0xFFFF (initial value)
     // This is the standard for RFC 1662 FCS when there's no payload
@@ -67,6 +69,7 @@ uint16_t hdlc_crc16(const uint8_t *data, unsigned len) {
     return crc ^ 0xFFFF;  // Final XOR
 }
 
+// Turns raw payload → HDLC frame
 int hdlc_encode(const uint8_t *payload, unsigned payload_len,
                 uint8_t *frame, unsigned frame_size) {
     if (!payload || !frame || payload_len == 0) {
@@ -147,79 +150,61 @@ int hdlc_encode(const uint8_t *payload, unsigned payload_len,
     return pos;  // Return encoded frame length
 }
 
+// Turns HDLC frame → payload
+// Used by Receive
 int hdlc_decode(const uint8_t *frame, unsigned frame_len,
-                uint8_t *payload, unsigned payload_size) {
-    if (!frame || !payload || frame_len < 4) {  // Minimum: flag + 1 byte + FCS + flag
-        return HDLC_ERROR;
+    uint8_t *payload, unsigned payload_size) {
+    if (!frame || !payload || frame_len < 2) {
+    return HDLC_ERROR;
     }
-    
-    // Skip leading flags
-    unsigned start = 0;
-    while (start < frame_len && frame[start] == HDLC_FLAG) {
-        start++;
-    }
-    
-    if (start >= frame_len) {
-        return HDLC_ERROR;  // Only flags, no data
-    }
-    
-    // First pass: decode everything (payload + FCS) into temporary buffer
+
     uint8_t decoded[HDLC_MAX_FRAME_SIZE];
     unsigned decoded_pos = 0;
-    unsigned i = start;
-    
+    unsigned i = 0;
+
     while (i < frame_len) {
-        if (frame[i] == HDLC_FLAG) {
-            // End of frame
-            break;
-        } else if (frame[i] == HDLC_ESCAPE) {
-            // Unescape next byte
-            if (i + 1 >= frame_len) {
-                return HDLC_INCOMPLETE;  // Escape without following byte
-            }
-            if (decoded_pos >= sizeof(decoded)) {
-                return HDLC_TOO_LARGE;
-            }
-            decoded[decoded_pos++] = frame[i + 1] ^ HDLC_XOR;
-            i += 2;  // Skip escape and escaped byte
-        } else {
-            // Normal byte
-            if (decoded_pos >= sizeof(decoded)) {
-                return HDLC_TOO_LARGE;
-            }
-            decoded[decoded_pos++] = frame[i];
-            i++;
-        }
+    if (frame[i] == HDLC_ESCAPE) {
+    if (i + 1 >= frame_len) {
+        return HDLC_INCOMPLETE;
     }
-    
-    // Need at least 2 bytes for FCS
-    if (decoded_pos < 2) {
-        return HDLC_ERROR;
-    }
-    
-    // Extract FCS (last 2 bytes) and payload
-    uint16_t received_fcs = decoded[decoded_pos - 2] | (decoded[decoded_pos - 1] << 8);
-    unsigned payload_len = decoded_pos - 2;
-    
-    if (payload_len > payload_size) {
+    if (decoded_pos >= sizeof(decoded)) {
         return HDLC_TOO_LARGE;
     }
-    
-    // Copy payload
+    decoded[decoded_pos++] = frame[i + 1] ^ HDLC_XOR;
+    i += 2;
+    } else {
+    if (decoded_pos >= sizeof(decoded)) {
+        return HDLC_TOO_LARGE;
+    }
+    decoded[decoded_pos++] = frame[i++];
+    }
+    }
+
+    if (decoded_pos < 2) {
+    return HDLC_ERROR;
+    }
+
+    uint16_t received_fcs =
+    decoded[decoded_pos - 2] | (decoded[decoded_pos - 1] << 8);
+
+    unsigned payload_len = decoded_pos - 2;
+    if (payload_len > payload_size) {
+    return HDLC_TOO_LARGE;
+    }
+
     for (unsigned j = 0; j < payload_len; j++) {
-        payload[j] = decoded[j];
+    payload[j] = decoded[j];
     }
-    
-    // Verify FCS
+
     uint16_t calculated_fcs = hdlc_crc16(payload, payload_len);
-    
     if (received_fcs != calculated_fcs) {
-        return HDLC_FCS_ERROR;
+    return HDLC_FCS_ERROR;
     }
-    
-    return payload_len;  // Return decoded payload length
+
+    return payload_len;
 }
 
+// Send payload over UART using HDLC framing
 int hdlc_send(const uint8_t *payload, unsigned payload_len) {
     uint8_t frame[HDLC_MAX_FRAME_SIZE];
     
@@ -235,9 +220,13 @@ int hdlc_send(const uint8_t *payload, unsigned payload_len) {
         }
     }
     
+    // Flush TX buffer to ensure all bytes are transmitted
+    uart_flush_tx();
+    
     return HDLC_OK;
 }
 
+// Receive one HDLC frame from UART.
 int hdlc_recv(uint8_t *payload, unsigned payload_size) {
     uint8_t frame[HDLC_MAX_FRAME_SIZE];
     unsigned frame_pos = 0;
