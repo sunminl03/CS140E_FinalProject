@@ -279,7 +279,7 @@ def main():
             print("  If not provided, will attempt to auto-detect")
             sys.exit(1)
         print(f"Auto-detected port: {port}")
-
+    # # this is for hdlc loopback test
     # payload = bytes([
     #     0x48, 0x44, 0x4c, 0x43,   # "HDLC"
     #     0x00,
@@ -290,10 +290,22 @@ def main():
     #     0x33,
     #     0x03
     # ])
+    # # this is for ppp test
+    # payload = bytes([
+    # 0xFF, 0x03,       # PPP address/control
+    # 0xC0, 0x21,       # protocol = LCP
+    # 0x11, 0x22, 0x33  # fake info field
+    # ])
+    # this for lcp test
     payload = bytes([
-    0xFF, 0x03,       # PPP address/control
-    0xC0, 0x21,       # protocol = LCP
-    0x11, 0x22, 0x33  # fake info field
+    0xFF, 0x03,             # PPP address/control
+    0xC0, 0x21,             # PPP protocol = LCP
+
+    0x01, 0x09, 0x00, 0x14, # LCP: Configure-Request, id=9, len=20
+
+    0x01, 0x04, 0x05, 0xDC,             # MRU = 1500
+    0x02, 0x06, 0xFF, 0xFF, 0xFF, 0xFF, # ACCM = FFFFFFFF
+    0x05, 0x06, 0xCA, 0xFE, 0xBA, 0xBE  # Magic = CAFEBABE
     ])
     # sending encoded frame to the Pi
     tx_frame = hdlc_encode(payload)
