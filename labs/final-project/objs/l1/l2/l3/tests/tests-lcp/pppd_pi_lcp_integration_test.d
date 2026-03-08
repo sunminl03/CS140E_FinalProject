@@ -1,5 +1,5 @@
-objs/l1/l2/l3//tests/tests-lcp/lcp_send_config.o: \
- tests/tests-lcp/lcp_send_config.c \
+objs/l1/l2/l3//tests/tests-lcp/pppd_pi_lcp_integration_test.o: \
+ tests/tests-lcp/pppd_pi_lcp_integration_test.c \
  /Users/sunminlee/cs140e-26win//libpi/include/rpi.h \
  /Users/sunminlee/cs140e-26win//libpi/libc/demand.h \
  /Users/sunminlee/cs140e-26win//libpi/include/gpio.h \
