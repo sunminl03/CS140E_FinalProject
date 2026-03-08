@@ -6,6 +6,9 @@ enum {
 };
 static uint8_t g_our_last_confreq_id = 0;
 static int g_our_confreq_acked = 0;
+static int g_peer_confreq_acked = 0;
+static lcp_state_t g_lcp_state = LCP_STATE_CLOSED;
+
 
 static lcp_config_t g_lcp_cfg = {
     .wanted_mru = 1500,
@@ -119,6 +122,20 @@ static int lcp_send_term_ack(uint8_t identifier,
     return lcp_send_control(LCP_TERM_ACK, identifier, req_data, req_len);
 }
 
+static void lcp_update_state(void) {
+    if (g_our_confreq_acked && g_peer_confreq_acked) {
+        g_lcp_state = LCP_STATE_OPENED;
+    } else if (g_our_confreq_acked) { // our config request was acked by the peer
+        g_lcp_state = LCP_STATE_ACK_RCVD;
+    } else if (g_peer_confreq_acked) {// peer config request was acked by us
+        g_lcp_state = LCP_STATE_ACK_SENT;
+    } else if (g_our_last_confreq_id != 0) {
+        g_lcp_state = LCP_STATE_REQ_SENT;
+    } else {
+        g_lcp_state = LCP_STATE_CLOSED;
+    }
+}
+
 // int lcp_send_config_req(uint8_t identifier) {
 //     uint8_t req_data[6];
 
@@ -149,6 +166,8 @@ int lcp_send_config_req(uint8_t identifier) {
     g_our_last_confreq_id = identifier;
     g_our_confreq_acked = 0;
 
+    lcp_update_state();
+
     req_data[0] = LCP_OPT_MAGIC_NUMBER;
     req_data[1] = 6;
     put_be32(&req_data[2], g_lcp_cfg.magic_number);
@@ -157,6 +176,12 @@ int lcp_send_config_req(uint8_t identifier) {
            identifier, g_lcp_cfg.magic_number);
 
     return lcp_send_control(LCP_CONFIG_REQ, identifier, req_data, sizeof req_data);
+}
+static void lcp_reset_state(void) {
+    g_our_last_confreq_id = 0;
+    g_our_confreq_acked = 0;
+    g_peer_confreq_acked = 0;
+    g_lcp_state = LCP_STATE_CLOSED;
 }
 /*
  * Parse Configure-Request options and decide whether to:
@@ -170,6 +195,8 @@ int lcp_send_config_req(uint8_t identifier) {
  *   - Else -> send Configure-Ack
  */
 static int lcp_handle_config_req(const lcp_pkt_t *pkt) {
+    g_peer_confreq_acked = 0;
+    lcp_update_state();
     uint8_t rej_buf[LCP_MAX_DATA_LEN];
     uint8_t nak_buf[LCP_MAX_DATA_LEN];
     unsigned rej_len = 0;
@@ -289,7 +316,13 @@ static int lcp_handle_config_req(const lcp_pkt_t *pkt) {
     }
 
     printk("LCP: sending Configure-Ack\n");
+    g_peer_confreq_acked = 1;
+    lcp_update_state();
     return lcp_send_config_ack(pkt->identifier, pkt->data, pkt->data_len);
+}
+/* Useful for PPP to know if IPCP should start sending IP packets */
+int lcp_is_open(void) {
+    return g_lcp_state == LCP_STATE_OPENED;
 }
 
 int lcp_handle_packet(const uint8_t *info, unsigned info_len) {
@@ -299,6 +332,7 @@ int lcp_handle_packet(const uint8_t *info, unsigned info_len) {
         printk("LCP: parse failed %d\n", ret);
         return ret;
     }
+    int r;
 
     lcp_print_packet(&pkt);
 
@@ -311,6 +345,7 @@ int lcp_handle_packet(const uint8_t *info, unsigned info_len) {
         if (pkt.identifier == g_our_last_confreq_id) {
             g_our_confreq_acked = 1;
             printk("LCP: our Configure-Request was acked\n");
+            lcp_update_state();
         }
         return LCP_OK;
 
@@ -323,11 +358,16 @@ int lcp_handle_packet(const uint8_t *info, unsigned info_len) {
         return LCP_OK;
 
     case LCP_TERM_REQ:
-        printk("LCP: received Terminate-Request, sending Terminate-Ack\n");
-        return lcp_send_term_ack(pkt.identifier, pkt.data, pkt.data_len);
+        // printk("LCP: received Terminate-Request, sending Terminate-Ack\n");
+        // lcp_reset_state();
+        // return lcp_send_term_ack(pkt.identifier, pkt.data, pkt.data_len);
+        r = lcp_send_term_ack(pkt.identifier, pkt.data, pkt.data_len);
+        lcp_reset_state();
+        return r;
 
     case LCP_TERM_ACK:
         printk("LCP: received Terminate-Ack\n");
+        lcp_reset_state();
         return LCP_OK;
 
     case LCP_ECHO_REQ:

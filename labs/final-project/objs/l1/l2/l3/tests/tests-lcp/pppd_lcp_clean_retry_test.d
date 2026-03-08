@@ -1,5 +1,5 @@
-objs/l1/l2/l3//tests/tests-lcp/lcp_fullpath_test.o: \
- tests/tests-lcp/lcp_fullpath_test.c \
+objs/l1/l2/l3//tests/tests-lcp/pppd_lcp_clean_retry_test.o: \
+ tests/tests-lcp/pppd_lcp_clean_retry_test.c \
  /Users/sunminlee/cs140e-26win//libpi/include/rpi.h \
  /Users/sunminlee/cs140e-26win//libpi/libc/demand.h \
  /Users/sunminlee/cs140e-26win//libpi/include/gpio.h \

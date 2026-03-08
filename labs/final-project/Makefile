@@ -5,7 +5,8 @@
 # PROGS += tests/tests-lcp/lcp_combined_test.c
 # PROGS += tests/tests-lcp/lcp_fullpath_test.c
 # PROGS += tests/tests-lcp/pppd_lcp_test.c
-PROGS += tests/tests-lcp/lcp_send_config.c
+# PROGS += tests/tests-lcp/lcp_send_config.c
+PROGS += tests/tests-lcp/pppd_lcp_clean_retry_test.c
 
 COMMON_SRC += hdlc_framing.c
 COMMON_SRC += ppp.c

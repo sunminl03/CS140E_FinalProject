@@ -13,6 +13,7 @@
  *   Length     (2 bytes, big-endian)
  *   Data       (Length - 4 bytes)
  */
+ 
 
 /* LCP packet codes */
 enum {
@@ -25,6 +26,15 @@ enum {
     LCP_ECHO_REQ    = 9,
     LCP_ECHO_REPLY  = 10,
 };
+
+/* LCP states */
+typedef enum {
+    LCP_STATE_CLOSED = 0,
+    LCP_STATE_REQ_SENT,
+    LCP_STATE_ACK_RCVD,   // peer ACKed our Configure-Request
+    LCP_STATE_ACK_SENT,   // we ACKed peer's Configure-Request
+    LCP_STATE_OPENED
+} lcp_state_t;
 
 /* LCP option types */
 enum {
@@ -45,8 +55,11 @@ enum {
 /* Minimal LCP configuration we support */
 typedef struct {
     uint16_t wanted_mru;       /* usually 1500 */
-    uint32_t wanted_accm;      /* usually 0xFFFFFFFF or 0 */
+    int want_mru;
+    uint32_t wanted_accm;  
+    int want_accm;    /* usually 0xFFFFFFFF or 0 */
     uint32_t magic_number;     /* our magic number */
+    int want_magic_number;
 } lcp_config_t;
 
 /* Parsed LCP packet */
@@ -69,5 +82,7 @@ void lcp_print_packet(const lcp_pkt_t *pkt);
 int lcp_handle_packet(const uint8_t *info, unsigned info_len);
 
 int lcp_send_config_req(uint8_t identifier);
+
+int lcp_is_open(void);
 
 #endif
