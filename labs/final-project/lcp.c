@@ -16,13 +16,19 @@ static int g_peer_confreq_acked = 0;
 static lcp_state_t g_lcp_state = LCP_STATE_CLOSED;
 // test-only: send unsupported option 99 exactly once to provoke ConfRej.
 // static int g_send_unsupported_opt_once = 1;
-
+// This is to reset the state machine to its initial state.
+static void lcp_reset_state(void) {
+    g_our_last_confreq_id = 0;
+    g_our_confreq_acked = 0;
+    g_peer_confreq_acked = 0;
+    g_lcp_state = LCP_STATE_CLOSED;
+}
 
 static lcp_config_t g_lcp_cfg = {
-    .want_mru = 1,
+    .want_mru = 1, // 1 means I want to configure MRU
     .want_accm = 1,
     .want_magic_number = 1, 
-    .wanted_mru = 1500,
+    .wanted_mru = 1500, // 1) when we send our request, we want to use this MRU. 2) When we receive pppd’s request → we compare to wanted_mru
     .wanted_accm = 0xFFFFFFFF,
     .magic_number = 0x12345678,    
 };
@@ -49,7 +55,11 @@ static void put_be32(uint8_t *p, uint32_t x) {
     p[2] = (x >> 8) & 0xFF;
     p[3] = x & 0xFF;
 }
-
+/*
+This function is to get the next ID for the next request we send.
+It is a simple incrementing counter.
+If it reaches 0, it wraps around to 1.
+*/
 static uint8_t lcp_next_id(void) {
     uint8_t id = g_next_confreq_id++;
     if (id == 0) {
@@ -59,12 +69,19 @@ static uint8_t lcp_next_id(void) {
     }
     return id;
 }
-
+/*
+We initialize the LCP state machine. 
+The first thing we do is to reset the state machine to its initial state.
+We also set the config to the values with pass it in. Call this before sending/receiving any LCP packets.
+*/
 void lcp_init(const lcp_config_t *cfg) {
     if (cfg)
         g_lcp_cfg = *cfg;
+    g_next_confreq_id = 1;
+    lcp_reset_state();
 }
 
+// Read the header and put the rest into the pkt data. 
 int lcp_parse(const uint8_t *info, unsigned info_len, lcp_pkt_t *pkt) {
     if (!info || !pkt)
         return LCP_ERR;
@@ -98,6 +115,10 @@ void lcp_print_packet(const lcp_pkt_t *pkt) {
            pkt->code, pkt->identifier, pkt->length, pkt->data_len);
 }
 
+/*
+When sending packet to pppd.
+We need to put the header and the data into the buffer.
+*/
 static int lcp_send_control(uint8_t code, uint8_t identifier,
                             const uint8_t *data, unsigned data_len) {
     uint8_t buf[LCP_HDR_LEN + LCP_MAX_DATA_LEN];
@@ -114,10 +135,12 @@ static int lcp_send_control(uint8_t code, uint8_t identifier,
 
     for (unsigned i = 0; i < data_len; i++)
         buf[4 + i] = data[i];
-
-    return ppp_send(PPP_PROTO_LCP, buf, total_len);
+            
+    return ppp_send(PPP_PROTO_LCP, buf, total_len); // need to let them know it's lcp protocol
 }
-
+/*
+All functions below are to send the packet to pppd.
+*/
 static int lcp_send_config_ack(uint8_t identifier,
                                const uint8_t *req_data, unsigned req_len) {
     return lcp_send_control(LCP_CONFIG_ACK, identifier, req_data, req_len);
@@ -143,17 +166,20 @@ static int lcp_send_term_ack(uint8_t identifier,
     return lcp_send_control(LCP_TERM_ACK, identifier, req_data, req_len);
 }
 
+/*
+Update the LCP state based on the current state of our and peer's config requests.
+*/
 static void lcp_update_state(void) {
     if (g_our_confreq_acked && g_peer_confreq_acked) {
-        g_lcp_state = LCP_STATE_OPENED;
+        g_lcp_state = LCP_STATE_OPENED; // both requests were acked
     } else if (g_our_confreq_acked) { // our config request was acked by the peer
         g_lcp_state = LCP_STATE_ACK_RCVD;
     } else if (g_peer_confreq_acked) {// peer config request was acked by us
         g_lcp_state = LCP_STATE_ACK_SENT;
     } else if (g_our_last_confreq_id != 0) {
-        g_lcp_state = LCP_STATE_REQ_SENT;
+        g_lcp_state = LCP_STATE_REQ_SENT; // our request was sent but not acked
     } else {
-        g_lcp_state = LCP_STATE_CLOSED;
+        g_lcp_state = LCP_STATE_CLOSED; // no requests were sent nor acked
     }
 }
 
@@ -181,6 +207,10 @@ static void lcp_update_state(void) {
 
 //     return lcp_send_control(LCP_CONFIG_REQ, identifier, req_data, sizeof req_data);
 // }
+/*
+This is called before lcp_send_control.
+We update state, put data into buffer, and pass it to lcp_send_control.
+*/
 int lcp_send_config_req(uint8_t identifier) {
     uint8_t req_data[LCP_MAX_DATA_LEN];
     unsigned len = 0;
@@ -196,12 +226,13 @@ int lcp_send_config_req(uint8_t identifier) {
 
     g_our_last_confreq_id = identifier;
     g_next_confreq_id = identifier + 1;
-    if (g_next_confreq_id == 0)
+    if (g_next_confreq_id == 0) // if it overflows to 0, wrap around to 1
         g_next_confreq_id = 1;
     g_our_confreq_acked = 0;
-    lcp_update_state();
+    lcp_update_state(); // update the state in case we are trying to request again (if we got acked before, we would be in acked state but we want to reset it)
 
-    if (g_lcp_cfg.want_mru) {
+    // if we want to configure MRU, add the MRU option to the request
+    if (g_lcp_cfg.want_mru) { // if we want to configure MRU
         req_data[len + 0] = LCP_OPT_MRU;
         req_data[len + 1] = 4;
         put_be16(&req_data[len + 2], g_lcp_cfg.wanted_mru);
@@ -225,15 +256,14 @@ int lcp_send_config_req(uint8_t identifier) {
     printk("LCP: sending our Configure-Request (id=%d)\n", identifier);
     return lcp_send_control(LCP_CONFIG_REQ, identifier, req_data, len);
 }
-static void lcp_reset_state(void) {
-    g_our_last_confreq_id = 0;
-    g_our_confreq_acked = 0;
-    g_peer_confreq_acked = 0;
-    g_lcp_state = LCP_STATE_CLOSED;
-}
 
 
-// this is to handle config_nak
+
+/* 
+This is to handle when our config request is naked by pppd.
+We need to parse the packet and update the config accordingly.
+We also need to send a new config request with the new config.
+*/
 static int lcp_handle_config_nak(const lcp_pkt_t *pkt) {
     const uint8_t *p = pkt->data;
     unsigned rem = pkt->data_len;
@@ -326,6 +356,12 @@ static int lcp_handle_config_nak(const lcp_pkt_t *pkt) {
     return lcp_send_config_req(lcp_next_id());
 }
 
+
+/*
+This is to handle when our config request is rejected by pppd.
+We need to parse the packet and update the config accordingly.
+We also need to send a new config request with the new config.
+*/
 static int lcp_handle_config_rej(const lcp_pkt_t *pkt) {
     const uint8_t *p = pkt->data;
     unsigned rem = pkt->data_len;
@@ -388,6 +424,8 @@ static int lcp_handle_config_rej(const lcp_pkt_t *pkt) {
 }
 
 /*
+This is when we receive a config request from pppd. 
+We parse and see if the options are acceptable, supported, or unsupported.
  * Parse Configure-Request options and decide whether to:
  *   - ACK: all options acceptable
  *   - NAK: supported option, but we want a different value
@@ -442,7 +480,7 @@ static int lcp_handle_config_req(const lcp_pkt_t *pkt) {
                 uint16_t peer_mru = get_be16(&p[2]);
                 printk("LCP: peer MRU=%d\n", peer_mru);
 
-                if (peer_mru != g_lcp_cfg.wanted_mru) {
+                if (peer_mru != g_lcp_cfg.wanted_mru) { 
                     /* supported option, but propose our preferred MRU */
                     nak_buf[nak_len + 0] = LCP_OPT_MRU; // type of option we are sending
                     nak_buf[nak_len + 1] = 4; // length of what we are sending (1 byte)
@@ -524,11 +562,17 @@ static int lcp_handle_config_req(const lcp_pkt_t *pkt) {
     lcp_update_state();
     return lcp_send_config_ack(pkt->identifier, pkt->data, pkt->data_len);
 }
+
 /* Useful for PPP to know if IPCP should start sending IP packets */
 int lcp_is_open(void) {
     return g_lcp_state == LCP_STATE_OPENED;
 }
 
+/*
+Depending on which packet it is, I need to pass the packet to different handlers.
+Ex) If the packet is a config request, I need to pass it to lcp_handle_config_req.
+If the packet naked pi's request, I need to pass it to lcp_handle_config_nak.
+*/
 int lcp_handle_packet(const uint8_t *info, unsigned info_len) {
     lcp_pkt_t pkt;
     int ret = lcp_parse(info, info_len, &pkt);
