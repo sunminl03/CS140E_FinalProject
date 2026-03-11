@@ -76,7 +76,10 @@ void notmain() {
     // jump to it using BRANCHTO.  make sure
     // you skip the header!  (see in hello-f.list
     // and memmap.fixed in 13-fat32/hello-fixed
-    unimplemented();
+    // moving file into the address 
+    memcpy((void *)addr, f->data, f->n_data);
+    // branch to start address
+    BRANCHTO(0x9000010);
 
     trace("returned from <%s>!\n", name);
 

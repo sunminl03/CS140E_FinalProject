@@ -223,6 +223,7 @@ void notmain(void) {
     // Q4: if you set this to ~0, what happens w.r.t. Q1?
     // Q5: if you set this to 0, what happens?
     domain_access_ctrl_set(DOM_client << dom_kern*2); 
+    // trace("here\n");
 
     // set address space id, page table, and pid.
     // note:
