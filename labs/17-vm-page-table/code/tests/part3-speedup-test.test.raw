@@ -1,0 +1,173 @@
+DEBUG:done with options: dev name=</dev/cu.usbserial-110>, pi-prog=<./tests/part3-speedup-test.bin>, trace=0
+opened tty port </dev/cu.usbserial-110>.
+DEBUG:my-install: tty-usb=</dev/cu.usbserial-110> program=<./tests/part3-speedup-test.bin>: about to boot
+TRACE:simple_boot: sending 24108 bytes, crc32=e12da153
+BOOT:waiting for a start
+BOOT:bootloader: Done.
+------------------------------
+printing pte entry [index=512 = addr=0x100800]:
+HASH:	PTE crc:: hash=0xa0b5eb0e,nbytes=4
+	0b1000000000	= sec_base_addr
+	0x0x200
+	  --> va=0x20000000
+	          76543210 [digit position]
+	0b0	= nG
+	0b0	= S
+	0b0	= APX
+	0b0	= TEX
+	0b1	= AP
+	0b0	= IMP
+	0b1	= domain
+	0b0	= XN
+	0b0	= C
+	0b0	= B
+	0b10	= tag
+------------------------------
+printing pte entry [index=513 = addr=0x100804]:
+HASH:	PTE crc:: hash=0xf653f334,nbytes=4
+	0b1000000001	= sec_base_addr
+	0x0x201
+	  --> va=0x20100000
+	          76543210 [digit position]
+	0b0	= nG
+	0b0	= S
+	0b0	= APX
+	0b0	= TEX
+	0b1	= AP
+	0b0	= IMP
+	0b1	= domain
+	0b0	= XN
+	0b0	= C
+	0b0	= B
+	0b10	= tag
+------------------------------
+printing pte entry [index=514 = addr=0x100808]:
+HASH:	PTE crc:: hash=0xa753bc13,nbytes=4
+	0b1000000010	= sec_base_addr
+	0x0x202
+	  --> va=0x20200000
+	          76543210 [digit position]
+	0b0	= nG
+	0b0	= S
+	0b0	= APX
+	0b0	= TEX
+	0b1	= AP
+	0b0	= IMP
+	0b1	= domain
+	0b0	= XN
+	0b0	= C
+	0b0	= B
+	0b10	= tag
+------------------------------
+printing pte entry [index=0 = addr=0x100000]:
+HASH:	PTE crc:: hash=0x5fe59de2,nbytes=4
+	0b0	= sec_base_addr
+	  --> va=0x0
+	          76543210 [digit position]
+	0b0	= nG
+	0b0	= S
+	0b0	= APX
+	0b1	= TEX
+	0b1	= AP
+	0b0	= IMP
+	0b1	= domain
+	0b0	= XN
+	0b0	= C
+	0b0	= B
+	0b10	= tag
+------------------------------
+printing pte entry [index=1 = addr=0x100004]:
+HASH:	PTE crc:: hash=0x10011b4e,nbytes=4
+	0b1	= sec_base_addr
+	  --> va=0x100000
+	          76543210 [digit position]
+	0b0	= nG
+	0b0	= S
+	0b0	= APX
+	0b1	= TEX
+	0b1	= AP
+	0b0	= IMP
+	0b1	= domain
+	0b0	= XN
+	0b0	= C
+	0b0	= B
+	0b10	= tag
+------------------------------
+printing pte entry [index=143 = addr=0x10023c]:
+HASH:	PTE crc:: hash=0x93505b9c,nbytes=4
+	0b10001111	= sec_base_addr
+	0x0x8f
+	  --> va=0x8f00000
+	          76543210 [digit position]
+	0b0	= nG
+	0b0	= S
+	0b0	= APX
+	0b1	= TEX
+	0b1	= AP
+	0b0	= IMP
+	0b1	= domain
+	0b0	= XN
+	0b0	= C
+	0b0	= B
+	0b10	= tag
+------------------------------
+printing pte entry [index=127 = addr=0x1001fc]:
+HASH:	PTE crc:: hash=0x66816268,nbytes=4
+	0b1111111	= sec_base_addr
+	0x0x7f
+	  --> va=0x7f00000
+	          76543210 [digit position]
+	0b0	= nG
+	0b0	= S
+	0b0	= APX
+	0b1	= TEX
+	0b1	= AP
+	0b0	= IMP
+	0b1	= domain
+	0b0	= XN
+	0b0	= C
+	0b0	= B
+	0b10	= tag
+------------------------------
+printing pte entry [index=10 = addr=0x100028]:
+HASH:	PTE crc:: hash=0x6fa1da7c,nbytes=4
+	0b1010	= sec_base_addr
+	0x0xa
+	  --> va=0xa00000
+	          76543210 [digit position]
+	0b0	= nG
+	0b0	= S
+	0b0	= APX
+	0b1	= TEX
+	0b1	= AP
+	0b0	= IMP
+	0b1	= domain
+	0b0	= XN
+	0b1	= C
+	0b1	= B
+	0b10	= tag
+cycles=2135, dtlb misses = 1, itlb misses = 4
+tests/part3-speedup-test.c:273: measuring tlb misses after invalidation:
+	cycles=2036
+	instruction microtlb miss=8
+	data microtlb miss=4
+	cache disabled run=1: total misses=200, total cycles=8857
+	cache disabled run=2: total misses=200, total cycles=8854
+	cache disabled run=3: total misses=200, total cycles=8877
+	----------------------------------------
+	cache enabled  run=1: total misses=1, total cycles=2009
+	cache enabled  run=2: total misses=0, total cycles=2069
+	cache enabled  run=3: total misses=0, total cycles=1985
+	----------------------------------------
+	after flush    run=1: total misses=1, total cycles=2023
+	after flush    run=2: total misses=1, total cycles=2012
+	after flush    run=3: total misses=1, total cycles=2012
+	----------------------------------------
+	after no flush run=1: total misses=0, total cycles=2044
+	after no flush run=2: total misses=0, total cycles=1997
+	after no flush run=3: total misses=0, total cycles=2022
+	----------------------------------------
+TRACE:notmain:SUCCESS!
+DONE!!!
+
+bootloader: pi exited.  cleaning up
