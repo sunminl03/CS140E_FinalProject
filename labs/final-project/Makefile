@@ -1,5 +1,5 @@
 # PROGS += hdlc_example.c
-PROGS += tests/tests-hdlc/hdlc_loopback_test.c
+# PROGS += tests/tests-hdlc/hdlc_loopback_test.c
 # PROGS += tests/tests-hdlc/tests-ppp/ppp_test.c
 # PROGS += tests/tests-ppp/ppp_loopback_test.c
 # PROGS += tests/tests-lcp/lcp_combined_test.c
@@ -11,11 +11,15 @@ PROGS += tests/tests-hdlc/hdlc_loopback_test.c
 # PROGS += tests/tests-lcp/lcp_nak_rej_accept_test.c
 # PROGS += tests/tests-ipcp/ipcp_handler_test.c
 # PROGS += tests/tests-ipcp/pppd_ipcp_integration_test.c
+# PROGS += tests/tests-ip/ip_test.c
+# PROGS += tests/tests-ip/ip_icmp_handle_test.c
+PROGS += tests/tests-ip/pppd_icmp_echo_test.c
 
 COMMON_SRC += hdlc_framing.c
 COMMON_SRC += ppp.c
 COMMON_SRC += lcp.c
 COMMON_SRC += ipcp.c
+COMMON_SRC += ip.c
 
 BOOTLOADER = my-install
 TTYUSB = 
