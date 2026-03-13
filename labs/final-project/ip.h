@@ -14,16 +14,6 @@ enum {
     IP_PROTO_UDP  = 17,
 };
 
-// added for ICMP echo request/reply
-struct icmp_echo {
-    uint8_t  type;      // 8 req, 0 reply
-    uint8_t  code;      // 0
-    uint16_t checksum;
-    uint16_t ident;
-    uint16_t seq;
-    uint8_t  data[];    // variable
-};
-
 // return codes
 enum {
     IP_OK        = 0,

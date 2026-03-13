@@ -28,7 +28,6 @@ COMMON_SRC += ppp.c
 COMMON_SRC += lcp.c
 COMMON_SRC += ipcp.c
 COMMON_SRC += ip.c
-COMMON_SRC += ip.c
 
 BOOTLOADER = my-install
 TTYUSB = 
