@@ -200,8 +200,34 @@ int ip_handle_packet(const uint8_t *info, unsigned info_len) {
     switch (hdr.protocol) {
     case IP_PROTO_ICMP:
         printk("IP: received ICMP packet (%d bytes)\n", hdr.payload_len);
+        if (hdr.payload_len < 8) {
+            return IP_TOO_SHORT;
+        }
         // TODO: icmp handler
-        return IP_OK;
+        struct icmp_echo *icmp = (struct icmp_echo *)hdr.payload;
+        // ignore Echo Reply for now
+        if (icmp->type != 8) {
+            printk("IP: received ICMP echo reply\n");
+            return IP_OK;
+        }
+        // when Echo Request, build reply payload 
+        uint8_t out_icmp[1500];
+        if (hdr.payload_len > sizeof out_icmp)
+            return IP_ERR;
+        
+        const uint8_t *in = hdr.payload;
+        for (unsigned i = 0; i < hdr.payload_len; i++)
+            out_icmp[i] = in[i];
+        out_icmp[0] = 0;   // Echo Reply
+        out_icmp[1] = 0;   // code
+        out_icmp[2] = 0;   // checksum high
+        out_icmp[3] = 0;   // checksum low
+
+        uint16_t cksum = ip_checksum(out_icmp, hdr.payload_len);
+        out_icmp[2] = (cksum >> 8) & 0xff;
+        out_icmp[3] = cksum & 0xff;
+        // swap source and destination IP
+        return ip_send(hdr.dst, hdr.src, IP_PROTO_ICMP, out_icmp, hdr.payload_len);
 
     case IP_PROTO_UDP:
         printk("IP: received UDP packet (%d bytes)\n", hdr.payload_len);
