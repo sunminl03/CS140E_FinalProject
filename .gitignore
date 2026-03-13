@@ -14,3 +14,10 @@ minnow/
 
 labs/final-project/steps.md
 Makefile.local
+*.bin
+*.list
+*.o
+*.d
+*.elf
+*.a
+objs/
