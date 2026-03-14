@@ -211,6 +211,12 @@ int ip_handle_packet(const uint8_t *info, unsigned info_len) {
     case IP_PROTO_UDP:
         printk("IP: received UDP packet (%d bytes)\n", hdr.payload_len);
         return udp_handle_packet(hdr.src, hdr.dst, hdr.payload, hdr.payload_len);
+        // TODO: udp handler
+        return IP_OK;
+    case IP_PROTO_TCP:
+        printk("IP: received TCP packet (%d bytes)\n", hdr.payload_len);
+        // TODO: tcp handler
+        return IP_OK;
 
     default:
         printk("IP: unsupported protocol %d\n", hdr.protocol);
