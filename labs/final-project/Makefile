@@ -23,7 +23,8 @@
 # PROGS += tests/tests-tcp/tcp_sender_test.c
 # PROGS += tests/tests-tcp/tcp_receiver_edge_test.c
 # PROGS += tests/tests-tcp/tcp_connection_test.c
-PROGS += tests/tests-tcp/tcp_ip_integration_test.c
+# PROGS += tests/tests-tcp/tcp_ip_integration_test.c
+PROGS += tests/tests-tcp/pppd_http_server_test.c # full http loop
 
 # comment out: this is to temporarily change $CS140E_2026_PATH
 -include Makefile.local

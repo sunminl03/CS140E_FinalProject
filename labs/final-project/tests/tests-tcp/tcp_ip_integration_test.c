@@ -11,6 +11,7 @@ static uint8_t g_tx_payload[1600];
 static unsigned g_tx_payload_len;
 static unsigned g_tx_count;
 
+// capture the tcp bytes that the live ip/tcp stack tries to send
 static int capture_tcp_output(uint32_t src, uint32_t dst, uint8_t protocol,
                               const uint8_t *payload, unsigned payload_len) {
     g_tx_src = src;
@@ -33,6 +34,7 @@ static void clear_tx_capture(void) {
     g_tx_count = 0;
 }
 
+// build a checksummed tcp segment exactly like a real peer would send us
 static unsigned build_tcp_segment(uint32_t src_ip, uint32_t dst_ip,
                                   const tcp_hdr_t *hdr, uint8_t *out, unsigned out_size) {
     tcp_hdr_t tmp = *hdr;
@@ -42,6 +44,7 @@ static unsigned build_tcp_segment(uint32_t src_ip, uint32_t dst_ip,
     return (unsigned)n;
 }
 
+// wrap the tcp bytes in an ipv4 packet before handing them to ip_handle_packet
 static unsigned build_ip_packet(uint32_t src_ip, uint32_t dst_ip,
                                 const uint8_t *payload, unsigned payload_len,
                                 uint8_t *out, unsigned out_size) {
@@ -78,7 +81,7 @@ expected output:
     ack-only ackno: 9005
     ack-only seqno: 5001
     http flags: 16
-    http ackno: 9028
+    http ackno: 9029
     http seqno: 5001
     http first bytes: HTTP
     TCP IP INTEGRATION TEST DONE
@@ -96,6 +99,7 @@ void notmain(void) {
 
     tcp_set_output_fn(capture_tcp_output);
 
+    // host opens the tcp connection with a syn to port 80 on the pi
     tcp_hdr_t syn = {
         .src_port = 5000,
         .dst_port = 80,
@@ -115,6 +119,7 @@ void notmain(void) {
     unsigned syn_len = build_tcp_segment(host_ip, pi_ip, &syn, tcp_seg, sizeof tcp_seg);
     unsigned syn_pkt_len = build_ip_packet(host_ip, pi_ip, tcp_seg, syn_len, ip_pkt, sizeof ip_pkt);
 
+    // the live stack should answer that syn with a syn|ack
     clear_tx_capture();
     assert(ip_handle_packet(ip_pkt, syn_pkt_len) == IP_OK);
     assert(g_tx_count == 1);
@@ -129,6 +134,7 @@ void notmain(void) {
     assert(out_tcp.ackno == 9001);
     assert(out_tcp.seqno == 5000);
 
+    // the host acks the syn|ack to finish
     tcp_hdr_t ack = {
         .src_port = 5000,
         .dst_port = 80,
@@ -148,11 +154,13 @@ void notmain(void) {
     unsigned ack_len = build_tcp_segment(host_ip, pi_ip, &ack, tcp_seg, sizeof tcp_seg);
     unsigned ack_pkt_len = build_ip_packet(host_ip, pi_ip, tcp_seg, ack_len, ip_pkt, sizeof ip_pkt);
 
+    // a pure ack should not force the server to send anything back
     clear_tx_capture();
     assert(ip_handle_packet(ip_pkt, ack_pkt_len) == IP_OK);
     printk("tx count after pure ack: %d\n", g_tx_count);
     assert(g_tx_count == 0);
 
+    // send only the first four bytes of the request and expect just an ack
     tcp_hdr_t data = {
         .src_port = 5000,
         .dst_port = 80,
@@ -172,6 +180,7 @@ void notmain(void) {
     unsigned data_len = build_tcp_segment(host_ip, pi_ip, &data, tcp_seg, sizeof tcp_seg);
     unsigned data_pkt_len = build_ip_packet(host_ip, pi_ip, tcp_seg, data_len, ip_pkt, sizeof ip_pkt);
 
+    // the request is incomplete here, so the stack should only ack the bytes
     clear_tx_capture();
     assert(ip_handle_packet(ip_pkt, data_pkt_len) == IP_OK);
     assert(g_tx_count == 1);
@@ -183,6 +192,7 @@ void notmain(void) {
     assert(out_tcp.ackno == 9005);
     assert(out_tcp.seqno == 5001);
 
+    // finish the http request headers so the server can respond
     const char *rest = "/ HTTP/1.1\r\nHost: pi\r\n\r\n";
     tcp_hdr_t full_req = {
         .src_port = 5000,
@@ -203,6 +213,7 @@ void notmain(void) {
     unsigned req_len = build_tcp_segment(host_ip, pi_ip, &full_req, tcp_seg, sizeof tcp_seg);
     unsigned req_pkt_len = build_ip_packet(host_ip, pi_ip, tcp_seg, req_len, ip_pkt, sizeof ip_pkt);
 
+    // a complete get request should trigger an http response payload
     clear_tx_capture();
     assert(ip_handle_packet(ip_pkt, req_pkt_len) == IP_OK);
     assert(g_tx_count == 1);
