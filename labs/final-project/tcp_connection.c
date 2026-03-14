@@ -5,6 +5,8 @@
 static tcp_connection_t g_tcp_listener;
 static int g_tcp_listener_init = 0;
 static tcp_output_fn_t g_tcp_output_fn = ip_send; // global tcp output function
+static int g_tcp_led_init = 0;
+static int g_tcp_led_on = 0;
 
 static void tcp_connection_queue_sender_msg(tcp_connection_t *c, const tcp_sender_msg_t *msg) {
     assert(c);
@@ -164,6 +166,19 @@ static int tcp_connection_has_http_request(const tcp_connection_t *c) {
     return 0;
 }
 
+// turn led on/off
+static void tcp_connection_toggle_led(void) {
+    if (!g_tcp_led_init) {
+        gpio_set_output(TCP_CONNECTION_LED_PIN);
+        gpio_write(TCP_CONNECTION_LED_PIN, 0);
+        g_tcp_led_init = 1;
+        g_tcp_led_on = 0;
+    }
+
+    g_tcp_led_on = !g_tcp_led_on;
+    gpio_write(TCP_CONNECTION_LED_PIN, g_tcp_led_on);
+}
+
 // queue the http response once the request is complete
 static void tcp_connection_try_send_http_response(tcp_connection_t *c) {
     assert(c);
@@ -176,6 +191,7 @@ static void tcp_connection_try_send_http_response(tcp_connection_t *c) {
         return;
 
     c->http_response_sent = 1;
+    tcp_connection_toggle_led();
     assert(tcp_connection_send_http_response(c, "hello from pi\n") == TCP_OK);
 }
 

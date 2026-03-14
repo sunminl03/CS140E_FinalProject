@@ -223,5 +223,6 @@ void notmain(void) {
 
     tcp_set_output_fn(0);
     printk("TCP IP INTEGRATION TEST DONE\n");
+    delay_ms(2000);
     clean_reboot();
 }
