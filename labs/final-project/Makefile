@@ -13,8 +13,10 @@
 # PROGS += tests/tests-ipcp/pppd_ipcp_integration_test.c
 # PROGS += tests/tests-ip/ip_test.c
 # PROGS += tests/tests-ip/ip_icmp_handle_test.c
-PROGS += tests/tests-ip/pppd_icmp_echo_test.c
+PROGS += tests/tests-udp/udp_test.c
+# PROGS += tests/tests-ip/pppd_icmp_echo_test.c
 
+# comment out
 -include Makefile.local
 
 COMMON_SRC += hdlc_framing.c
