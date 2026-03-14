@@ -20,6 +20,7 @@
 # PROGS += tests/tests-tcp/byte_stream_test.c
 # PROGS += tests/tests-tcp/reassembler_test.c
 # # PROGS += tests/tests-tcp/tcp_receiver_test.c
+# PROGS += tests/tests-tcp/tcp_connection_test.c
 PROGS += tests/tests-tcp/tcp_sender_test.c
 PROGS += tests/tests-tcp/tcp_receiver_edge_test.c
 
@@ -38,6 +39,7 @@ COMMON_SRC += byte_stream.c
 COMMON_SRC += reassembler.c
 COMMON_SRC += tcp_receiver.c
 COMMON_SRC += tcp_sender.c
+COMMON_SRC += tcp_connection.c
 
 BOOTLOADER = my-install
 TTYUSB =
