@@ -29,26 +29,27 @@ typedef int (*tcp_output_fn_t)(uint32_t src, uint32_t dst, uint8_t protocol,
                                const uint8_t *payload, unsigned payload_len);
 
 typedef struct {
-    tcp_state_t state;
+    tcp_state_t state; // current state of connection
 
-    uint32_t local_ip;
-    uint32_t remote_ip;
-    uint16_t local_port;
-    uint16_t remote_port;
+    uint32_t local_ip; // our ip once a peer has selected this listener
+    uint32_t remote_ip; // peer ip for the active connection
+    uint16_t local_port; // listening/service port on the pi
+    uint16_t remote_port; // peer source port for the active connection
 
-    uint32_t isn_local;
-    unsigned rx_capacity;
+    uint32_t isn_local; // initial seqno we use when sending syn
+    unsigned rx_capacity; // receive-side byte capacity for this connection
 
-    tcp_receiver_t rx;
-    tcp_sender_t tx;
+    tcp_receiver_t rx; // receiver/reassembly side of tcp
+    tcp_sender_t tx; // sender/retransmission side of tcp
 
-    uint8_t rx_stream_storage[TCP_CONNECTION_MAX_RX_CAPACITY];
-    uint8_t rx_pending_data[TCP_CONNECTION_MAX_RX_CAPACITY];
-    uint8_t rx_present[TCP_CONNECTION_MAX_RX_CAPACITY];
-    uint8_t tx_input_storage[TCP_CONNECTION_TX_CAPACITY];
+    uint8_t rx_stream_storage[TCP_CONNECTION_MAX_RX_CAPACITY]; // assembled inbound bytes
+    uint8_t rx_pending_data[TCP_CONNECTION_MAX_RX_CAPACITY]; // out-of-order inbound bytes
+    uint8_t rx_present[TCP_CONNECTION_MAX_RX_CAPACITY]; // bitmap for pending inbound bytes
+    uint8_t tx_input_storage[TCP_CONNECTION_TX_CAPACITY]; // outbound app data waiting to send
 
-    tcp_connection_segment_t pending[TCP_CONNECTION_MAX_PENDING];
-    unsigned pending_count;
+    tcp_connection_segment_t pending[TCP_CONNECTION_MAX_PENDING]; // reply segments waiting to go out
+    unsigned pending_count; // number of queued reply segments
+    int http_response_sent; // flag to keep the server from replying twice
 } tcp_connection_t;
 
 // initialize open connection that starts in listen

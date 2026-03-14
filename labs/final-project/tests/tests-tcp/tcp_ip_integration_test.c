@@ -77,6 +77,10 @@ expected output:
     ack-only flags: 16
     ack-only ackno: 9005
     ack-only seqno: 5001
+    http flags: 16
+    http ackno: 9028
+    http seqno: 5001
+    http first bytes: HTTP
     TCP IP INTEGRATION TEST DONE
 */
 
@@ -178,6 +182,44 @@ void notmain(void) {
     assert(out_tcp.flags == TCP_ACK);
     assert(out_tcp.ackno == 9005);
     assert(out_tcp.seqno == 5001);
+
+    const char *rest = "/ HTTP/1.1\r\nHost: pi\r\n\r\n";
+    tcp_hdr_t full_req = {
+        .src_port = 5000,
+        .dst_port = 80,
+        .seqno = 9005,
+        .ackno = 5001,
+        .data_offset = TCP_HDR_LEN / 4,
+        .flags = TCP_ACK,
+        .window = 64,
+        .checksum = 0,
+        .urgent_ptr = 0,
+        .options = 0,
+        .options_len = 0,
+        .payload = (const uint8_t *)rest,
+        .payload_len = strlen(rest),
+    };
+
+    unsigned req_len = build_tcp_segment(host_ip, pi_ip, &full_req, tcp_seg, sizeof tcp_seg);
+    unsigned req_pkt_len = build_ip_packet(host_ip, pi_ip, tcp_seg, req_len, ip_pkt, sizeof ip_pkt);
+
+    clear_tx_capture();
+    assert(ip_handle_packet(ip_pkt, req_pkt_len) == IP_OK);
+    assert(g_tx_count == 1);
+    assert(tcp_parse(g_tx_payload, g_tx_payload_len, &out_tcp) == TCP_OK);
+    printk("http flags: %d\n", out_tcp.flags);
+    printk("http ackno: %u\n", out_tcp.ackno);
+    printk("http seqno: %u\n", out_tcp.seqno);
+    printk("http first bytes: %c%c%c%c\n",
+           out_tcp.payload[0], out_tcp.payload[1], out_tcp.payload[2], out_tcp.payload[3]);
+    assert(out_tcp.flags == TCP_ACK);
+    assert(out_tcp.ackno == 9005 + strlen(rest));
+    assert(out_tcp.seqno == 5001);
+    assert(out_tcp.payload_len > 4);
+    assert(out_tcp.payload[0] == 'H');
+    assert(out_tcp.payload[1] == 'T');
+    assert(out_tcp.payload[2] == 'T');
+    assert(out_tcp.payload[3] == 'P');
 
     tcp_set_output_fn(0);
     printk("TCP IP INTEGRATION TEST DONE\n");

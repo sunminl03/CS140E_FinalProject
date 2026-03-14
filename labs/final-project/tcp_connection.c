@@ -4,7 +4,7 @@
 
 static tcp_connection_t g_tcp_listener;
 static int g_tcp_listener_init = 0;
-static tcp_output_fn_t g_tcp_output_fn = ip_send;
+static tcp_output_fn_t g_tcp_output_fn = ip_send; // global tcp output function
 
 static void tcp_connection_queue_sender_msg(tcp_connection_t *c, const tcp_sender_msg_t *msg) {
     assert(c);
@@ -25,7 +25,7 @@ static void tcp_connection_queue_sender_msg(tcp_connection_t *c, const tcp_sende
         | (msg->syn ? TCP_SYN : 0)
         | (msg->fin ? TCP_FIN : 0)
         | (msg->rst ? TCP_RST : 0);
-    // advertise the receiver window we currently have available
+    // the receiver window we currently have available
     seg->hdr.window = rxmsg.window_size;
     seg->hdr.checksum = 0;
     seg->hdr.urgent_ptr = 0;
@@ -43,10 +43,12 @@ static void tcp_connection_queue_sender_msg(tcp_connection_t *c, const tcp_sende
     }
 }
 
+// allow tcp_sender to queue segments through the connection
 static void tcp_connection_tx_callback(void *ctx, const tcp_sender_msg_t *msg) {
     tcp_connection_queue_sender_msg(ctx, msg);
 }
 
+// reset the sender, receiver, and queued output
 static void tcp_connection_reset_streams(tcp_connection_t *c) {
     assert(c);
 
@@ -61,8 +63,10 @@ static void tcp_connection_reset_streams(tcp_connection_t *c) {
                     c->isn_local,
                     TCP_CONNECTION_DEFAULT_RTO_MS);
     c->pending_count = 0;
+    c->http_response_sent = 0;
 }
 
+// drop the active peer and return to listening state
 static void tcp_connection_return_to_listen(tcp_connection_t *c) {
     assert(c);
 
@@ -72,6 +76,7 @@ static void tcp_connection_return_to_listen(tcp_connection_t *c) {
     tcp_connection_reset_streams(c);
 }
 
+// check whether an incoming segment belongs to the current active peer
 static int tcp_connection_tuple_matches(const tcp_connection_t *c,
                                         uint32_t src_ip, uint32_t dst_ip,
                                         const tcp_hdr_t *h) {
@@ -81,11 +86,13 @@ static int tcp_connection_tuple_matches(const tcp_connection_t *c,
         && c->local_port == h->dst_port;
 }
 
+// helper to see if we need to ack
 static int tcp_connection_segment_needs_ack(const tcp_hdr_t *h) {
     return h->payload_len > 0 || (h->flags & (TCP_SYN | TCP_FIN));
 }
 
-static void tcp_connection_maybe_queue_ack(tcp_connection_t *c, const tcp_hdr_t *h,
+// queue an ack only when no other response segment was already produced
+static void tcp_connection_try_queue_ack(tcp_connection_t *c, const tcp_hdr_t *h,
                                            unsigned pending_before_push) {
     assert(c);
     assert(h);
@@ -104,6 +111,7 @@ static void tcp_connection_maybe_queue_ack(tcp_connection_t *c, const tcp_hdr_t 
     tcp_connection_queue_sender_msg(c, &ack);
 }
 
+// update the connection state based on incoming acks
 static void tcp_connection_update_state_after_ack(tcp_connection_t *c, const tcp_hdr_t *h) {
     assert(c);
     assert(h);
@@ -116,11 +124,11 @@ static void tcp_connection_update_state_after_ack(tcp_connection_t *c, const tcp
         return;
     }
 
-    if (c->state == TCP_LAST_ACK && c->tx.fin_sent
-        && tcp_sender_sequence_numbers_in_flight(&c->tx) == 0)
+    if (c->state == TCP_LAST_ACK && c->tx.fin_sent && tcp_sender_sequence_numbers_in_flight(&c->tx) == 0)
         tcp_connection_return_to_listen(c);
 }
 
+// append some length into the caller's buffer
 static unsigned tcp_connection_append_len(char *dst, unsigned n) {
     char tmp[16];
     unsigned digits = 0;
@@ -135,11 +143,48 @@ static unsigned tcp_connection_append_len(char *dst, unsigned n) {
     return digits;
 }
 
+// detect a get request buffered in the receive stream
+static int tcp_connection_has_http_request(const tcp_connection_t *c) {
+    unsigned len = 0;
+    const uint8_t *buf = byte_stream_peek(&c->rx.stream, &len);
+
+    if (!buf || len < 4)
+        return 0;
+
+    // only answer a get request once the full header block arrives
+    if (len < 5 || buf[0] != 'G' || buf[1] != 'E' || buf[2] != 'T' || buf[3] != ' ' || buf[4] != '/')
+        return 0;
+
+    for (unsigned i = 0; i + 3 < len; i++) {
+        if (buf[i] == '\r' && buf[i + 1] == '\n'
+            && buf[i + 2] == '\r' && buf[i + 3] == '\n')
+            return 1;
+    }
+
+    return 0;
+}
+
+// queue the http response once the request is complete
+static void tcp_connection_try_send_http_response(tcp_connection_t *c) {
+    assert(c);
+
+    if (c->http_response_sent)
+        return;
+    if (c->state != TCP_ESTABLISHED)
+        return;
+    if (!tcp_connection_has_http_request(c))
+        return;
+
+    c->http_response_sent = 1;
+    assert(tcp_connection_send_http_response(c, "hello from pi\n") == TCP_OK);
+}
+
+// initialize tcp connection object
 void tcp_connection_init(tcp_connection_t *c, unsigned rx_capacity) {
     assert(c);
     assert(rx_capacity <= TCP_CONNECTION_MAX_RX_CAPACITY);
 
-    // start as a listening server endpoint with no peer selected yet
+    // start as a listening server with no peer
     c->state = TCP_LISTEN;
     c->local_ip = 0;
     c->remote_ip = 0;
@@ -151,6 +196,7 @@ void tcp_connection_init(tcp_connection_t *c, unsigned rx_capacity) {
     tcp_connection_reset_streams(c);
 }
 
+// process one parsed tcp segment for this connection and queue any replies
 int tcp_connection_handle_segment(tcp_connection_t *c,
                                   uint32_t src_ip, uint32_t dst_ip,
                                   const tcp_hdr_t *h) {
@@ -161,7 +207,7 @@ int tcp_connection_handle_segment(tcp_connection_t *c,
         if (!(h->flags & TCP_SYN) || (h->flags & TCP_ACK))
             return TCP_OK;
 
-        // passive open: bind this connection object to the first peer that syns us
+        // bind this connection object to the first peer that syns
         c->remote_ip = src_ip;
         c->local_ip = dst_ip;
         c->remote_port = h->src_port;
@@ -178,7 +224,7 @@ int tcp_connection_handle_segment(tcp_connection_t *c,
         .window_size = h->window,
         .rst = (h->flags & TCP_RST) != 0,
     };
-    // let the sender learn what the peer has acked and what window it offers
+    // let sender learn what the peer has acked and what window it offers
     tcp_sender_receive(&c->tx, peer);
 
     tcp_sender_msg_t inbound = {
@@ -189,7 +235,7 @@ int tcp_connection_handle_segment(tcp_connection_t *c,
         .fin = (h->flags & TCP_FIN) != 0,
         .rst = (h->flags & TCP_RST) != 0,
     };
-    // feed the incoming bytes and control flags into the receiver side
+    // feed incoming bytes and ctrl flags into receiver side
     tcp_receiver_receive(&c->rx, inbound);
 
     if ((h->flags & TCP_FIN) && c->state == TCP_ESTABLISHED) {
@@ -203,12 +249,15 @@ int tcp_connection_handle_segment(tcp_connection_t *c,
         return TCP_OK;
 
     unsigned pending_before_push = c->pending_count;
+    // once a full get request is buffered, queue http response
+    tcp_connection_try_send_http_response(c);
     tcp_sender_push(&c->tx, tcp_connection_tx_callback, c);
-    tcp_connection_maybe_queue_ack(c, h, pending_before_push);
+    tcp_connection_try_queue_ack(c, h, pending_before_push);
 
     return TCP_OK;
 }
 
+// queue a http 200 response into the sender stream
 int tcp_connection_send_http_response(tcp_connection_t *c, const char *body) {
     assert(c);
     assert(body);
@@ -249,6 +298,7 @@ unsigned tcp_connection_pending_segments(const tcp_connection_t *c) {
     return c->pending_count;
 }
 
+// remove the oldest queued reply segment from the pending fifo
 int tcp_connection_pop_segment(tcp_connection_t *c, tcp_connection_segment_t *seg) {
     assert(c);
     assert(seg);
@@ -263,10 +313,12 @@ int tcp_connection_pop_segment(tcp_connection_t *c, tcp_connection_segment_t *se
     return TCP_OK;
 }
 
+// helper for tests to replace the real ip output path
 void tcp_set_output_fn(tcp_output_fn_t fn) {
     g_tcp_output_fn = fn ? fn : ip_send;
 }
 
+// build tcp bytes for every queued reply
 static int tcp_connection_send_pending(tcp_connection_t *c) {
     uint8_t segbuf[TCP_HDR_LEN + TCP_SENDER_MAX_PAYLOAD];
     tcp_connection_segment_t seg;
@@ -294,8 +346,8 @@ static int tcp_connection_send_pending(tcp_connection_t *c) {
     return TCP_OK;
 }
 
-int tcp_handle_packet(uint32_t src_ip, uint32_t dst_ip,
-                      const uint8_t *seg, unsigned seg_len) {
+// shared tcp entrypoint used by ip.c for live incoming tcp packets
+int tcp_handle_packet(uint32_t src_ip, uint32_t dst_ip, const uint8_t *seg, unsigned seg_len) {
     tcp_hdr_t hdr;
 
     if (!seg)
