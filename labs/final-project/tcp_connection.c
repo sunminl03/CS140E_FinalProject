@@ -1,4 +1,10 @@
 #include "tcp_connection.h"
+#include "ip.h"
+#include "net_util.h"
+
+static tcp_connection_t g_tcp_listener;
+static int g_tcp_listener_init = 0;
+static tcp_output_fn_t g_tcp_output_fn = ip_send;
 
 static void tcp_connection_queue_sender_msg(tcp_connection_t *c, const tcp_sender_msg_t *msg) {
     assert(c);
@@ -255,4 +261,62 @@ int tcp_connection_pop_segment(tcp_connection_t *c, tcp_connection_segment_t *se
         c->pending[i - 1] = c->pending[i];
     c->pending_count--;
     return TCP_OK;
+}
+
+void tcp_set_output_fn(tcp_output_fn_t fn) {
+    g_tcp_output_fn = fn ? fn : ip_send;
+}
+
+static int tcp_connection_send_pending(tcp_connection_t *c) {
+    uint8_t segbuf[TCP_HDR_LEN + TCP_SENDER_MAX_PAYLOAD];
+    tcp_connection_segment_t seg;
+
+    while (tcp_connection_pending_segments(c) > 0) {
+        if (tcp_connection_pop_segment(c, &seg) < 0)
+            return TCP_ERR;
+
+        // build the raw tcp segment, then fill in the mandatory checksum
+        seg.hdr.checksum = 0;
+        int seg_len = tcp_build(&seg.hdr, seg.hdr.payload, seg.hdr.payload_len,
+                                segbuf, sizeof segbuf);
+        if (seg_len < 0)
+            return seg_len;
+
+        uint16_t cksum = tcp_checksum(c->local_ip, c->remote_ip, segbuf, (unsigned)seg_len);
+        put_be16(&segbuf[16], cksum);
+
+        int r = g_tcp_output_fn(c->local_ip, c->remote_ip, IP_PROTO_TCP,
+                                segbuf, (unsigned)seg_len);
+        if (r < 0)
+            return r;
+    }
+
+    return TCP_OK;
+}
+
+int tcp_handle_packet(uint32_t src_ip, uint32_t dst_ip,
+                      const uint8_t *seg, unsigned seg_len) {
+    tcp_hdr_t hdr;
+
+    if (!seg)
+        return TCP_ERR;
+
+    if (!g_tcp_listener_init) {
+        tcp_connection_init(&g_tcp_listener, TCP_CONNECTION_MAX_RX_CAPACITY);
+        g_tcp_listener_init = 1;
+    }
+
+    // tcp checksum covers the ip plus the raw tcp segment bytes
+    if (tcp_checksum(src_ip, dst_ip, seg, seg_len) != 0)
+        return TCP_BAD_CKSUM;
+
+    int r = tcp_parse(seg, seg_len, &hdr);
+    if (r < 0)
+        return r;
+
+    r = tcp_connection_handle_segment(&g_tcp_listener, src_ip, dst_ip, &hdr);
+    if (r < 0)
+        return r;
+
+    return tcp_connection_send_pending(&g_tcp_listener);
 }

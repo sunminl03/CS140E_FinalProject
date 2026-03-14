@@ -68,7 +68,7 @@ int ip_send(uint32_t src, uint32_t dst, uint8_t protocol,
 // print ip header for debugging
 void ip_print_hdr(const ip_hdr_t *hdr);
 
-// handler suitable for ppp_dispatch ip_handler
+// handler for incoming ip packets from ppp_dispatch
 int ip_handle_packet(const uint8_t *info, unsigned info_len);
 
 #endif

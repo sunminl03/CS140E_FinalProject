@@ -1,5 +1,6 @@
 #include "ip.h"
 #include "ipcp.h"
+#include "tcp_connection.h"
 #include "udp.h"
 #include "net_util.h"
 
@@ -165,7 +166,6 @@ void ip_print_hdr(const ip_hdr_t *hdr) {
 }
 
 // handle an incoming ip packet from ppp_dispatch
-// TODO for now just parses and prints, will add icmp/udp handlers later
 int ip_handle_packet(const uint8_t *info, unsigned info_len) {
     ip_hdr_t hdr;
     int r = ip_parse(info, info_len, &hdr);
@@ -182,7 +182,6 @@ int ip_handle_packet(const uint8_t *info, unsigned info_len) {
         if (hdr.payload_len < 8) {
             return IP_TOO_SHORT;
         }
-        // TODO: icmp handler
         struct icmp_echo *icmp = (struct icmp_echo *)hdr.payload;
         // ignore Echo Reply for now
         if (icmp->type != 8) {
@@ -211,13 +210,9 @@ int ip_handle_packet(const uint8_t *info, unsigned info_len) {
     case IP_PROTO_UDP:
         printk("IP: received UDP packet (%d bytes)\n", hdr.payload_len);
         return udp_handle_packet(hdr.src, hdr.dst, hdr.payload, hdr.payload_len);
-        // TODO: udp handler
-        return IP_OK;
     case IP_PROTO_TCP:
         printk("IP: received TCP packet (%d bytes)\n", hdr.payload_len);
-        // TODO: tcp handler
-        return IP_OK;
-
+        return tcp_handle_packet(hdr.src, hdr.dst, hdr.payload, hdr.payload_len);
     default:
         printk("IP: unsupported protocol %d\n", hdr.protocol);
         return IP_OK;

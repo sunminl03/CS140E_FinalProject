@@ -20,9 +20,10 @@
 # PROGS += tests/tests-tcp/byte_stream_test.c
 # PROGS += tests/tests-tcp/reassembler_test.c
 # # PROGS += tests/tests-tcp/tcp_receiver_test.c
+# PROGS += tests/tests-tcp/tcp_sender_test.c
+# PROGS += tests/tests-tcp/tcp_receiver_edge_test.c
 # PROGS += tests/tests-tcp/tcp_connection_test.c
-PROGS += tests/tests-tcp/tcp_sender_test.c
-PROGS += tests/tests-tcp/tcp_receiver_edge_test.c
+PROGS += tests/tests-tcp/tcp_ip_integration_test.c
 
 # comment out: this is to temporarily change $CS140E_2026_PATH
 -include Makefile.local
@@ -45,6 +46,3 @@ BOOTLOADER = my-install
 TTYUSB =
 RUN = 1
 include $(CS140E_2026_PATH)/libpi/mk/Makefile.robust-v3
-
-clean::
-	make -C tests clean

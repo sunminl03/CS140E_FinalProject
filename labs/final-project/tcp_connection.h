@@ -25,6 +25,9 @@ typedef struct {
     uint8_t payload_buf[TCP_SENDER_MAX_PAYLOAD];
 } tcp_connection_segment_t;
 
+typedef int (*tcp_output_fn_t)(uint32_t src, uint32_t dst, uint8_t protocol,
+                               const uint8_t *payload, unsigned payload_len);
+
 typedef struct {
     tcp_state_t state;
 
@@ -65,5 +68,11 @@ unsigned tcp_connection_pending_segments(const tcp_connection_t *c);
 
 // pop the oldest queued reply segment
 int tcp_connection_pop_segment(tcp_connection_t *c, tcp_connection_segment_t *seg);
+
+// override how tcp sends completed segments for tests or alternate backends
+void tcp_set_output_fn(tcp_output_fn_t fn);
+
+// parse, handle, and send one incoming tcp segment on the shared listener
+int tcp_handle_packet(uint32_t src_ip, uint32_t dst_ip, const uint8_t *seg, unsigned seg_len);
 
 #endif
