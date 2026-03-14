@@ -1,5 +1,6 @@
 #include "ipcp.h"
 #include "lcp.h"
+#include "net_util.h"
 
 enum {
     IPCP_HDR_LEN = 4,
@@ -26,28 +27,6 @@ static ipcp_config_t g_ipcp_cfg = {
 /* peer's IP address learned from peer's Configure-Request */
 static uint32_t g_peer_ip_address = 0x00000000;
 
-static uint16_t get_be16(const uint8_t *p) {
-    return ((uint16_t)p[0] << 8) | p[1];
-}
-
-static uint32_t get_be32(const uint8_t *p) {
-    return ((uint32_t)p[0] << 24) |
-           ((uint32_t)p[1] << 16) |
-           ((uint32_t)p[2] << 8)  |
-           ((uint32_t)p[3]);
-}
-
-static void put_be16(uint8_t *p, uint16_t x) {
-    p[0] = (x >> 8) & 0xFF;
-    p[1] = x & 0xFF;
-}
-
-static void put_be32(uint8_t *p, uint32_t x) {
-    p[0] = (x >> 24) & 0xFF;
-    p[1] = (x >> 16) & 0xFF;
-    p[2] = (x >> 8) & 0xFF;
-    p[3] = x & 0xFF;
-}
 /*
 Returns next nonzero Configure-Request ID for retries.
 */
