@@ -5,11 +5,13 @@ static void reassembler_shift_left(reassembler_t *r, unsigned n) {
     if (n == 0)
         return;
 
+    // move the remaining pending window down
     for (unsigned i = n; i < r->capacity; i++) {
         r->pending_data[i - n] = r->pending_data[i];
         r->present[i - n] = r->present[i];
     }
 
+    // clear slots at the back of window
     for (unsigned i = r->capacity - n; i < r->capacity; i++) {
         r->pending_data[i] = 0;
         r->present[i] = 0;
@@ -19,6 +21,7 @@ static void reassembler_shift_left(reassembler_t *r, unsigned n) {
 // push the contiguous pending prefix into the output stream
 static void reassembler_flush(reassembler_t *r) {
     unsigned contiguous = 0;
+    // count how many bytes are now contiguous starting at the front
     while (contiguous < r->capacity && r->present[contiguous])
         contiguous++;
 
@@ -46,6 +49,7 @@ void reassembler_init(reassembler_t *r, byte_stream_t *stream, uint8_t *pending_
     r->has_last = 0;
     r->last_index = 0;
 
+    // start with an empty pending window
     for (unsigned i = 0; i < capacity; i++) {
         r->pending_data[i] = 0;
         r->present[i] = 0;
@@ -78,10 +82,11 @@ void reassembler_insert(reassembler_t *r, uint64_t first_index, const uint8_t *d
             end = first_unacceptable;
 
         if (start < end) {
+            // copy slice into the pending window
             for (uint64_t abs_idx = start; abs_idx < end; abs_idx++) {
                 unsigned rel = (unsigned)(abs_idx - first_unassembled);
                 if (!r->present[rel]) {
-                    // only count a byte the first time we learn it
+                    // only count a byte the first time it's learned
                     r->present[rel] = 1;
                     r->pending_data[rel] = data[abs_idx - first_index];
                     r->pending_count++;

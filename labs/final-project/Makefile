@@ -19,7 +19,8 @@
 # PROGS += tests/tests-tcp/tcp_test.c
 # PROGS += tests/tests-tcp/byte_stream_test.c
 # PROGS += tests/tests-tcp/reassembler_test.c
-PROGS += tests/tests-tcp/tcp_receiver_test.c
+# PROGS += tests/tests-tcp/tcp_receiver_test.c
+PROGS += tests/tests-tcp/tcp_sender_test.c
 
 # comment out: this is to temporarily change $CS140E_2026_PATH
 -include Makefile.local
@@ -35,6 +36,7 @@ COMMON_SRC += tcp.c
 COMMON_SRC += byte_stream.c
 COMMON_SRC += reassembler.c
 COMMON_SRC += tcp_receiver.c
+COMMON_SRC += tcp_sender.c
 
 BOOTLOADER = my-install
 TTYUSB =

@@ -3,23 +3,8 @@
 
 #include "byte_stream.h"
 #include "reassembler.h"
+#include "tcp_messages.h"
 #include "wrap32.h"
-
-typedef struct {
-    uint32_t seqno;
-    const uint8_t *payload;
-    unsigned payload_len;
-    int syn;
-    int fin;
-    int rst;
-} tcp_sender_msg_t;
-
-typedef struct {
-    int has_ackno;
-    uint32_t ackno;
-    uint16_t window_size;
-    int rst;
-} tcp_receiver_msg_t;
 
 typedef struct {
     byte_stream_t stream;
