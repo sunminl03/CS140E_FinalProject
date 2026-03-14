@@ -13,10 +13,15 @@
 # PROGS += tests/tests-ipcp/pppd_ipcp_integration_test.c
 # PROGS += tests/tests-ip/ip_test.c
 # PROGS += tests/tests-ip/ip_icmp_handle_test.c
-PROGS += tests/tests-udp/udp_test.c
+# PROGS += tests/tests-udp/udp_test.c
 # PROGS += tests/tests-ip/pppd_icmp_echo_test.c
+# PROGS += tests/tests-tcp/wrap32_test.c
+# PROGS += tests/tests-tcp/tcp_test.c
+# PROGS += tests/tests-tcp/byte_stream_test.c
+# PROGS += tests/tests-tcp/reassembler_test.c
+PROGS += tests/tests-tcp/tcp_receiver_test.c
 
-# comment out
+# comment out: this is to temporarily change $CS140E_2026_PATH
 -include Makefile.local
 
 COMMON_SRC += hdlc_framing.c
@@ -25,6 +30,11 @@ COMMON_SRC += lcp.c
 COMMON_SRC += ipcp.c
 COMMON_SRC += ip.c
 COMMON_SRC += udp.c
+COMMON_SRC += wrap32.c
+COMMON_SRC += tcp.c
+COMMON_SRC += byte_stream.c
+COMMON_SRC += reassembler.c
+COMMON_SRC += tcp_receiver.c
 
 BOOTLOADER = my-install
 TTYUSB =

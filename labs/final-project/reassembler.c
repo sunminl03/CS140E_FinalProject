@@ -81,6 +81,7 @@ void reassembler_insert(reassembler_t *r, uint64_t first_index, const uint8_t *d
             for (uint64_t abs_idx = start; abs_idx < end; abs_idx++) {
                 unsigned rel = (unsigned)(abs_idx - first_unassembled);
                 if (!r->present[rel]) {
+                    // only count a byte the first time we learn it
                     r->present[rel] = 1;
                     r->pending_data[rel] = data[abs_idx - first_index];
                     r->pending_count++;
@@ -89,6 +90,7 @@ void reassembler_insert(reassembler_t *r, uint64_t first_index, const uint8_t *d
         }
     }
 
+    // flush as much as possible into the stream
     reassembler_flush(r);
 
     if (r->has_last && r->output->bytes_pushed == r->last_index)
