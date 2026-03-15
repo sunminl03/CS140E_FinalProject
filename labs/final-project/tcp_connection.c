@@ -8,6 +8,10 @@ static tcp_output_fn_t g_tcp_output_fn = ip_send; // global tcp output function
 static int g_tcp_led_init = 0;
 static int g_tcp_led_on = 0;
 
+// take sender output and package it into a real outgoing TCP segment
+// 1. adding the correct ports
+// 2. adding ACK info from receiver state
+// 3. copying payload into stable storage
 static void tcp_connection_queue_sender_msg(tcp_connection_t *c, const tcp_sender_msg_t *msg) {
     assert(c);
     assert(msg);
@@ -69,6 +73,7 @@ static void tcp_connection_reset_streams(tcp_connection_t *c) {
 }
 
 // drop the active peer and return to listening state
+// connection is over; go back to passive listening.
 static void tcp_connection_return_to_listen(tcp_connection_t *c) {
     assert(c);
 
@@ -131,6 +136,7 @@ static void tcp_connection_update_state_after_ack(tcp_connection_t *c, const tcp
 }
 
 // append some length into the caller's buffer
+// write a number as text into a buffer to build the HTTP Content-Length header.
 static unsigned tcp_connection_append_len(char *dst, unsigned n) {
     char tmp[16];
     unsigned digits = 0;
@@ -146,6 +152,7 @@ static unsigned tcp_connection_append_len(char *dst, unsigned n) {
 }
 
 // detect a get request buffered in the receive stream
+// have we received a full HTTP GET request yet?
 static int tcp_connection_has_http_request(const tcp_connection_t *c) {
     unsigned len = 0;
     const uint8_t *buf = byte_stream_peek(&c->rx.stream, &len);
@@ -167,6 +174,7 @@ static int tcp_connection_has_http_request(const tcp_connection_t *c) {
 }
 
 // turn led on/off
+// flip the LED whenever a request is served
 static void tcp_connection_toggle_led(void) {
     if (!g_tcp_led_init) {
         gpio_set_output(TCP_CONNECTION_LED_PIN);
@@ -190,12 +198,13 @@ static void tcp_connection_try_send_http_response(tcp_connection_t *c) {
     if (!tcp_connection_has_http_request(c))
         return;
 
-    c->http_response_sent = 1;
-    tcp_connection_toggle_led();
-    assert(tcp_connection_send_http_response(c, "hello from pi\n") == TCP_OK);
+    c->http_response_sent = 1; // 1. marks http_response_sent = 1
+    tcp_connection_toggle_led(); // 2. toggles LED
+    assert(tcp_connection_send_http_response(c, "hello from pi\n") == TCP_OK); // 3. sends "hello from pi\n"
 }
 
 // initialize tcp connection object
+// Initializes a TCP connection object as a listening server.
 void tcp_connection_init(tcp_connection_t *c, unsigned rx_capacity) {
     assert(c);
     assert(rx_capacity <= TCP_CONNECTION_MAX_RX_CAPACITY);
@@ -219,18 +228,18 @@ int tcp_connection_handle_segment(tcp_connection_t *c,
     assert(c);
     assert(h);
 
-    if (c->state == TCP_LISTEN) {
+    if (c->state == TCP_LISTEN) { // we only accept SYN packets in listening state
         if (!(h->flags & TCP_SYN) || (h->flags & TCP_ACK))
             return TCP_OK;
 
-        // bind this connection object to the first peer that syns
+        // if it is SYN, bind this connection object to the first peer that syns
         c->remote_ip = src_ip;
         c->local_ip = dst_ip;
         c->remote_port = h->src_port;
         c->local_port = h->dst_port;
         tcp_connection_reset_streams(c);
-        c->state = TCP_SYN_RCVD;
-    } else if (!tcp_connection_tuple_matches(c, src_ip, dst_ip, h)) {
+        c->state = TCP_SYN_RCVD; // update to SYN Received 
+    } else if (!tcp_connection_tuple_matches(c, src_ip, dst_ip, h)) { // is this packet from the client we are currently talking to?
         return TCP_OK;
     }
 
